@@ -1,4 +1,7 @@
+import { ColorSceneIllustration } from "@/components/ColorSceneIllustration";
 import type { Palette } from "@/lib/constants";
+import type { ColorOptionId } from "@/lib/learning-content";
+import type { KidProfile } from "@/lib/kid-profile";
 
 type BigKeyDisplayProps = {
   displayText: string | null;
@@ -17,8 +20,12 @@ type BigKeyDisplayProps = {
   immersive?: boolean;
   constrained?: boolean;
   previewColor?: string | null;
+  activeColorId?: ColorOptionId | null;
   activeEnglishLetter?: string | null;
   floatingEchoText?: string | null;
+  kidProfile?: KidProfile | null;
+  kidAgeLabel?: string | null;
+  kidPlayStyleLabel?: string | null;
 };
 
 const FLOATING_ECHOES = [
@@ -45,8 +52,12 @@ export function BigKeyDisplay({
   immersive = false,
   constrained = false,
   previewColor = null,
+  activeColorId = null,
   activeEnglishLetter = null,
-  floatingEchoText = null
+  floatingEchoText = null,
+  kidProfile = null,
+  kidAgeLabel = null,
+  kidPlayStyleLabel = null
 }: BigKeyDisplayProps) {
   const isIdle = displayText === null;
   const uppercaseLetter = activeEnglishLetter?.toUpperCase() ?? null;
@@ -135,6 +146,28 @@ export function BigKeyDisplay({
             >
               {voiceStatus}
             </span>
+            {kidAgeLabel ? (
+              <span
+                className="rounded-full px-3 py-2"
+                style={{
+                  background: palette.badgeSurface,
+                  color: palette.badgeText
+                }}
+              >
+                {kidAgeLabel}
+              </span>
+            ) : null}
+            {kidPlayStyleLabel ? (
+              <span
+                className="rounded-full px-3 py-2"
+                style={{
+                  background: palette.badgeSurface,
+                  color: palette.badgeText
+                }}
+              >
+                {kidPlayStyleLabel}
+              </span>
+            ) : null}
           </div>
         </div>
         {!immersive && !constrained ? (
@@ -152,25 +185,24 @@ export function BigKeyDisplay({
           key={burstKey}
           className={`mx-auto flex w-full ${constrained ? "max-w-3xl" : "max-w-4xl"} flex-col items-center text-center ${isIdle ? "soft-rise" : "key-burst"}`}
         >
-          <div
-            className={`${emojiClasses} grid place-items-center rounded-[2rem] shadow-[0_22px_45px_rgba(255,255,255,0.28)]`}
-            style={{
-              background: palette.badgeSurface,
-              color: palette.badgeText
-            }}
-            aria-hidden="true"
-          >
-            {previewColor ? (
-              <div
-                className="relative h-[72%] w-[72%] overflow-hidden rounded-[1.2rem] border border-white/85 shadow-[inset_0_1px_6px_rgba(255,255,255,0.45)]"
-                style={{ background: previewColor }}
-              >
-                <div className="absolute inset-x-2 top-1.5 h-3 rounded-full bg-white/25 blur-sm" />
-              </div>
-            ) : (
-              emoji
-            )}
-          </div>
+          {previewColor && activeColorId ? (
+            <ColorSceneIllustration
+              colorId={activeColorId}
+              swatch={previewColor}
+              profile={kidProfile}
+            />
+          ) : (
+            <div
+              className={`${emojiClasses} grid place-items-center rounded-[2rem] shadow-[0_22px_45px_rgba(255,255,255,0.28)]`}
+              style={{
+                background: palette.badgeSurface,
+                color: palette.badgeText
+              }}
+              aria-hidden="true"
+            >
+              {emoji}
+            </div>
+          )}
 
           <div className="relative isolate mt-1 w-full">
             {floatingEchoText && !isIdle ? (

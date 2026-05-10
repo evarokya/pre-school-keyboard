@@ -10,7 +10,12 @@ export type ColorOptionId =
   | "orange"
   | "purple"
   | "pink"
-  | "brown";
+  | "brown"
+  | "teal"
+  | "mint"
+  | "white"
+  | "gray"
+  | "peach";
 
 type LearningCopyLanguage = "english" | "arabic" | "bengali";
 
@@ -186,6 +191,61 @@ const COLOR_OPTIONS: readonly ColorDefinition[] = [
       english: { label: "Brown", speechText: "brown", textDirection: "ltr" },
       arabic: { label: "بني", speechText: "بني", textDirection: "rtl" },
       bengali: { label: "বাদামী", speechText: "বাদামী", textDirection: "ltr" }
+    }
+  },
+  {
+    id: "teal",
+    swatch: "#6fcfd1",
+    ring: "#43a7aa",
+    labelTextColor: "#175f61",
+    copy: {
+      english: { label: "Teal", speechText: "teal", textDirection: "ltr" },
+      arabic: { label: "تركوازي", speechText: "تركوازي", textDirection: "rtl" },
+      bengali: { label: "টিল", speechText: "টিল", textDirection: "ltr" }
+    }
+  },
+  {
+    id: "mint",
+    swatch: "#b8f1d1",
+    ring: "#7cc79f",
+    labelTextColor: "#206647",
+    copy: {
+      english: { label: "Mint", speechText: "mint", textDirection: "ltr" },
+      arabic: { label: "نعناعي", speechText: "نعناعي", textDirection: "rtl" },
+      bengali: { label: "মিন্ট", speechText: "মিন্ট", textDirection: "ltr" }
+    }
+  },
+  {
+    id: "white",
+    swatch: "#fffef9",
+    ring: "#d8d4c9",
+    labelTextColor: "#6d6a60",
+    copy: {
+      english: { label: "White", speechText: "white", textDirection: "ltr" },
+      arabic: { label: "أبيض", speechText: "أبيض", textDirection: "rtl" },
+      bengali: { label: "সাদা", speechText: "সাদা", textDirection: "ltr" }
+    }
+  },
+  {
+    id: "gray",
+    swatch: "#cdd5df",
+    ring: "#9aa6b6",
+    labelTextColor: "#465160",
+    copy: {
+      english: { label: "Gray", speechText: "gray", textDirection: "ltr" },
+      arabic: { label: "رمادي", speechText: "رمادي", textDirection: "rtl" },
+      bengali: { label: "ধূসর", speechText: "ধূসর", textDirection: "ltr" }
+    }
+  },
+  {
+    id: "peach",
+    swatch: "#ffc9ad",
+    ring: "#e4a485",
+    labelTextColor: "#7f4d34",
+    copy: {
+      english: { label: "Peach", speechText: "peach", textDirection: "ltr" },
+      arabic: { label: "خوخي", speechText: "خوخي", textDirection: "rtl" },
+      bengali: { label: "পিচ", speechText: "পিচ", textDirection: "ltr" }
     }
   }
 ] as const;

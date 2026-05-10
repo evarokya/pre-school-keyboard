@@ -1,31 +1,40 @@
 # Nuha Keyboard
 
-Playful browser typing game for one child that displays and speaks the actual pressed key.
+Browser-only early learning project for one child with local-only parent settings, family voice recordings, and playful practice across letters, colors, numbers, and simple keyboard skills.
 
-Repo:    TBD
-Domain:  local-only / private family app
+Repo:    https://github.com/raj-khan/pre-school-keyboard
+Domain:  browser-first / family project / no backend
 License: MIT
+
+## Product shape
+
+- `Letters` mode: alphabet-focused learning
+- `Computer` mode: broader keyboard familiarity
+- `Colors` mode: larger color palette with lightweight animated scenes
+- `Numbers` pack: numbers-only board with parent-selected range and order
+- `Child setup`: first-visit age band and play-style preferences stored only in local storage
+- `Voice`: browser speech, shipped number clips, and direct family recordings from `public/audio/letters-by-nuha/`
+- `Public pages`: contribute/share page plus share metadata and social preview image routes
 
 ## Stack
 
-- Language:        TypeScript 5, strict mode
-- Package manager: pnpm
-- Framework:       Next.js 16 App Router
-- Frontend:        React + Tailwind CSS
-- Browser APIs:    SpeechSynthesis API, HTML Audio, Fullscreen API
-- Backend:         None in version 1
-- Testing:         Vitest + React Testing Library
-- Node:            >=20
+- TypeScript 5, strict mode
+- Next.js 16 App Router
+- React 19
+- Tailwind CSS 4
+- pnpm
+- Vitest
+- Browser APIs: SpeechSynthesis, HTML Audio, Fullscreen, LocalStorage, Web Share
 
 ## Commands
 
 ```bash
-pnpm install               # install dependencies after the app is scaffolded
-pnpm dev                   # start local development server
-pnpm build                 # production build
-pnpm lint                  # lint project files
-pnpm typecheck             # run TypeScript checks
-pnpm test                  # run unit tests
+pnpm install
+pnpm dev
+pnpm build
+pnpm lint
+pnpm typecheck
+pnpm test
 ```
 
 ## Architecture
@@ -33,89 +42,61 @@ pnpm test                  # run unit tests
 ```text
 src/
   app/
-    page.tsx
     layout.tsx
+    page.tsx
+    contribute/page.tsx
+    opengraph-image.tsx
+    twitter-image.tsx
     globals.css
   components/
     TypingGame.tsx
     BigKeyDisplay.tsx
-    RecentKeys.tsx
+    ColorPaletteBar.tsx
+    ColorSceneIllustration.tsx
     ControlButtons.tsx
-    LanguageSelector.tsx
+    KidProfileSheet.tsx
+    NumberBoard.tsx
+    ParentSettings.tsx
+    SiteNav.tsx
+    SiteFooter.tsx
+    ShareActions.tsx
     VirtualKeyboard.tsx
   lib/
-    getSpeechText.ts
-    getDisplayText.ts
-    random.ts
     constants.ts
+    kid-profile.ts
     language-packs.ts
+    learning-content.ts
+    numbers.ts
+    parent-settings-state.ts
     resolveLanguageKey.ts
+    site.ts
     voice.ts
 ```
 
-Dependency flow:
-
-```text
-app/page.tsx
-  -> components/TypingGame.tsx
-TypingGame.tsx
-  -> components/BigKeyDisplay.tsx
-  -> components/RecentKeys.tsx
-  -> components/ControlButtons.tsx
-  -> components/LanguageSelector.tsx
-  -> components/VirtualKeyboard.tsx
-  -> lib/getSpeechText.ts
-  -> lib/getDisplayText.ts
-  -> lib/random.ts
-  -> lib/constants.ts
-  -> lib/language-packs.ts
-  -> lib/resolveLanguageKey.ts
-  -> lib/voice.ts
-```
-
-## Brand rules
-
-| What | Correct | Never use |
-|---|---|---|
-| Product name | Nuha Keyboard | pre-school-keyboard, Pre School Keyboard, generic SaaS boilerplate |
-| Domain | local-only / private app | public marketing domain placeholders |
-| Package scope | `nuha-keyboard` | template scope names |
-
-No fake social proof: no customer logos, no testimonials, no GitHub star counts, no compliance badges, no user or revenue metrics.
-
-## Do not build in version 1
-
-- Login, user accounts, or parent dashboards
-- Database, cloud storage, or analytics
-- Payments, subscriptions, or ads
-- AI features, leaderboards, or multiplayer
-- Complex levels, reward systems, or admin panels
-- PWA/offline mode until the base experience is stable
-
-## Build order
-
-1. Scaffold the Next.js app shell and main full-screen typing screen.
-2. Implement key capture, display text mapping, speech text mapping, and speech playback.
-3. Add random colors, emoji reactions, encouragement messages, and key-press animation.
-4. Add Mute/Unmute, Clear, and Fullscreen controls.
-5. Add recent key history, special key polish, and tests for mapping helpers.
-6. Keep the language-pack model open so contributors can add more scripts and future audio assets.
-
 ## Rules
 
-- No `any` without an explanatory comment
-- Keep keyboard mapping logic in `src/lib/` and UI state in `src/components/`
-- No backend, database, login, analytics, or network calls in version 1
-- Spoken text must match the actual key pressed, including friendly names for numbers, punctuation, and special keys
-- Recent key history is capped at 10 items
-- Gracefully handle browsers that do not support speech or fullscreen APIs
-- Language switching and virtual-keyboard behavior should be driven by `src/lib/language-packs.ts`
-- Voice playback should go through `src/lib/voice.ts` so packs can later move to real audio assets
-- Future parent controls should be able to filter keyboard rows down to selected weak letters without redefining a language pack
-- Stage files by name - never `git add .` or `git add -A`
-- Commit messages: imperative mood, no AI co-author lines, no file lists
+- Keep the app client-side only.
+- Store child setup and parent settings in local storage only.
+- Explain local-only storage in natural language in the UI.
+- Keep English `Letters` alphabet-only.
+- Keep `Computer` separate from `Letters` and `Numbers`.
+- Keep `Numbers` numbers-only.
+- Keep color mode visual and scene-driven, not just text-on-color.
+- Route all voice behavior through `src/lib/voice.ts`.
+- Try direct family recordings in `public/audio/letters-by-nuha/` before community packs and speech fallback.
+- Keep parent controls responsive and scroll-safe on mobile.
+- Use restrained animation that still feels playful on desktop and mobile.
+- Stage files by name, never `git add .` or `git add -A`.
+
+## Do not build yet
+
+- Accounts, login, cloud sync, or analytics
+- Payments, subscriptions, or ads
+- Backend APIs or database work
+- AI tutoring, multiplayer, or heavy gamification
+- Complex admin panels or dashboards
 
 ## Do not touch
 
-- `universal/` - shared boilerplate conventions stay unchanged
-- `kids_typing_game_development_plan.pdf` - source brief from the user
+- `universal/`
+- `kids_typing_game_development_plan.pdf`

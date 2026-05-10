@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getColorLearningContent,
   getColorOptionById,
+  getResolvedColorOptions,
   getLearningModeLabel
 } from "../learning-content";
 
@@ -24,6 +25,14 @@ describe("learning content", () => {
     expect(getColorLearningContent("arabic")).toMatchObject({
       direction: "rtl",
       prompt: "اضغط على لون لسماع اسمه."
+    });
+  });
+
+  it("ships an expanded color learning palette", () => {
+    expect(getResolvedColorOptions("english")).toHaveLength(13);
+    expect(getColorOptionById("white", "bengali")).toMatchObject({
+      label: "সাদা",
+      speechText: "সাদা"
     });
   });
 });

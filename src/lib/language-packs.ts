@@ -297,8 +297,8 @@ export const LANGUAGE_PACKS: readonly LanguagePack[] = [
     nativeLabel: "বাংলা",
     description: "A Bengali starter pack with vowels, consonants, and a wide native space key.",
     direction: "ltr",
-    prompt: "কীবোর্ডে চাপ দাও বা বাংলা কীগুলোতে ক্লিক করো।",
-    hint: "বাংলা কীগুলোতে ক্লিক করো, বা বাংলা হার্ডওয়্যার লেআউট ব্যবহার করো।",
+    prompt: "ক্লিক করো।",
+    hint: "বাংলা কীগুলোতে ক্লিক করো",
     voice: BENGALI_VOICE,
     allowGenericInput: false,
     rows: [

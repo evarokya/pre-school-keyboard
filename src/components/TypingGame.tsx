@@ -5,8 +5,11 @@ import { startTransition, useEffect, useEffectEvent, useRef, useState, useSyncEx
 import { BigKeyDisplay } from "@/components/BigKeyDisplay";
 import { ColorPaletteBar } from "@/components/ColorPaletteBar";
 import { ControlButtons } from "@/components/ControlButtons";
+import { KidProfileSheet } from "@/components/KidProfileSheet";
 import { NumberBoard } from "@/components/NumberBoard";
 import { ParentSettings } from "@/components/ParentSettings";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteNav } from "@/components/SiteNav";
 import { VirtualKeyboard } from "@/components/VirtualKeyboard";
 import {
   EMOJIS,
@@ -19,10 +22,20 @@ import {
   getColorLearningContent,
   getColorOptionById,
   getLearningModeLabel,
+  type ColorOptionId,
   type LearningMode
 } from "@/lib/learning-content";
 import {
-  DEFAULT_LANGUAGE_ID,
+  getKidAgeLabel,
+  getKidPlayStyleLabel,
+  getProfileAwareHint,
+  getRecommendedNumberRange,
+  loadKidProfile,
+  saveKidProfile,
+  subscribeToKidProfile,
+  type KidProfile
+} from "@/lib/kid-profile";
+import {
   ENGLISH_COMPUTER_PRACTICE_PACK,
   getLanguagePackById,
   type LanguageKey,
@@ -32,10 +45,13 @@ import {
 import {
   getNumberAssetKey,
   getNumberBoardValues,
-  getNumberSpeechText,
-  type NumberBoardOrder,
-  type NumberRangeMax
+  getNumberSpeechText
 } from "@/lib/numbers";
+import {
+  loadParentSettingsState,
+  saveParentSettingsState,
+  subscribeToParentSettingsState
+} from "@/lib/parent-settings-state";
 import { getRandomDifferentItem, getRandomItem } from "@/lib/random";
 import { resolveLanguageInput, resolveVirtualLanguageKey, type ResolvedLanguageKey } from "@/lib/resolveLanguageKey";
 import { isVoicePlaybackAvailable, speakWithVoice, stopVoicePlayback } from "@/lib/voice";
@@ -100,18 +116,27 @@ function shouldIgnoreShortcut(event: KeyboardEvent): boolean {
 
 export function TypingGame() {
   const [gameState, setGameState] = useState(INITIAL_STATE);
-  const [isMuted, setIsMuted] = useState(false);
-  const [learningMode, setLearningMode] = useState<LearningMode>("letters");
-  const [selectedLanguageId, setSelectedLanguageId] = useState<LanguagePackId>(DEFAULT_LANGUAGE_ID);
-  const [numberRangeMax, setNumberRangeMax] = useState<NumberRangeMax>(20);
-  const [numberBoardOrder, setNumberBoardOrder] = useState<NumberBoardOrder>("ascending");
+  const [isKidProfileEditorOpen, setIsKidProfileEditorOpen] = useState(false);
   const [numberBoardRandomSeed, setNumberBoardRandomSeed] = useState(1);
-  const [showVirtualKeyboard, setShowVirtualKeyboard] = useState(true);
-  const [showPlayControls, setShowPlayControls] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  const parentSettings = useSyncExternalStore(
+    subscribeToParentSettingsState,
+    loadParentSettingsState,
+    loadParentSettingsState
+  );
+  const {
+    isMuted,
+    learningMode,
+    selectedLanguageId,
+    numberRangeMax,
+    numberBoardOrder,
+    showVirtualKeyboard,
+    showPlayControls
+  } = parentSettings;
   const mutedRef = useRef(isMuted);
   const paletteRef = useRef(INITIAL_PALETTE);
+  const kidProfile = useSyncExternalStore(subscribeToKidProfile, loadKidProfile, () => null);
   const selectedLanguagePack = getLanguagePackById(selectedLanguageId);
   const activeLanguagePack =
     learningMode === "computer" ? ENGLISH_COMPUTER_PRACTICE_PACK : selectedLanguagePack;
@@ -138,6 +163,16 @@ export function TypingGame() {
   useEffect(() => {
     mutedRef.current = isMuted;
   }, [isMuted]);
+
+  function updateParentSettings(
+    nextSettings:
+      | typeof parentSettings
+      | ((currentSettings: typeof parentSettings) => typeof parentSettings)
+  ) {
+    saveParentSettingsState(
+      typeof nextSettings === "function" ? nextSettings(parentSettings) : nextSettings
+    );
+  }
 
   function getPackSpeechLang(languagePack: LanguagePack): string {
     return languagePack.voice.type === "speech-synthesis"
@@ -250,14 +285,17 @@ export function TypingGame() {
   }, []);
 
   function handleToggleMute() {
-    setIsMuted((currentValue) => {
-      const nextValue = !currentValue;
+    updateParentSettings((currentSettings) => {
+      const nextValue = !currentSettings.isMuted;
 
       if (nextValue && canSpeak) {
         stopVoicePlayback();
       }
 
-      return nextValue;
+      return {
+        ...currentSettings,
+        isMuted: nextValue
+      };
     });
   }
 
@@ -280,7 +318,10 @@ export function TypingGame() {
     }
 
     stopVoicePlayback();
-    setSelectedLanguageId(languageId);
+    updateParentSettings((currentSettings) => ({
+      ...currentSettings,
+      selectedLanguageId: languageId
+    }));
     setGameState((currentState) => ({
       ...INITIAL_STATE,
       displayDirection: getIdleDisplayDirection(learningMode, languageId),
@@ -295,7 +336,10 @@ export function TypingGame() {
     }
 
     stopVoicePlayback();
-    setLearningMode(nextLearningMode);
+    updateParentSettings((currentSettings) => ({
+      ...currentSettings,
+      learningMode: nextLearningMode
+    }));
     setGameState((currentState) => ({
       ...INITIAL_STATE,
       displayDirection: getIdleDisplayDirection(nextLearningMode, selectedLanguageId),
@@ -304,20 +348,37 @@ export function TypingGame() {
     }));
   }
 
-  function handleNumberRangeChange(maxNumber: NumberRangeMax) {
-    setNumberRangeMax(maxNumber);
+  function handleSaveKidProfile(profile: KidProfile) {
+    const recommendedNumberRange = getRecommendedNumberRange(profile.ageGroup);
+
+    saveKidProfile(profile);
+    updateParentSettings((currentSettings) => ({
+      ...currentSettings,
+      numberRangeMax: recommendedNumberRange
+    }));
+    setIsKidProfileEditorOpen(false);
+  }
+
+  function handleNumberRangeChange(maxNumber: typeof numberRangeMax) {
+    updateParentSettings((currentSettings) => ({
+      ...currentSettings,
+      numberRangeMax: maxNumber
+    }));
 
     if (numberBoardOrder === "random") {
       setNumberBoardRandomSeed((currentValue) => currentValue + 1);
     }
   }
 
-  function handleNumberBoardOrderChange(nextOrder: NumberBoardOrder) {
+  function handleNumberBoardOrderChange(nextOrder: typeof numberBoardOrder) {
     if (nextOrder === numberBoardOrder) {
       return;
     }
 
-    setNumberBoardOrder(nextOrder);
+    updateParentSettings((currentSettings) => ({
+      ...currentSettings,
+      numberBoardOrder: nextOrder
+    }));
 
     if (nextOrder === "random") {
       setNumberBoardRandomSeed((currentValue) => currentValue + 1);
@@ -341,7 +402,7 @@ export function TypingGame() {
     });
   }
 
-  function handleColorSelect(colorId: Parameters<typeof getColorOptionById>[0]) {
+  function handleColorSelect(colorId: ColorOptionId) {
     const resolvedColor = getColorOptionById(colorId, selectedLanguageId);
 
     void activateDisplayItem({
@@ -397,10 +458,15 @@ export function TypingGame() {
         : activeLanguagePack.prompt;
   const idleHint =
     learningMode === "colors"
-      ? colorLearningContent.hint
-      : showNumberBoard
-        ? `The number board is set to 1 through ${numberRangeMax}, and symbols stay in Computer mode.`
-        : activeLanguagePack.hint;
+      ? getProfileAwareHint("colors", colorLearningContent.hint, kidProfile, false)
+      : getProfileAwareHint(
+          learningMode,
+          showNumberBoard
+            ? `The number board is set to 1 through ${numberRangeMax}, and symbols stay in Computer mode.`
+            : activeLanguagePack.hint,
+          kidProfile,
+          showNumberBoard
+        );
   const activeEnglishLetter =
     learningMode === "letters" &&
     selectedLanguageId === "english" &&
@@ -435,16 +501,38 @@ export function TypingGame() {
       compact
     />
   ) : null;
+  const kidAgeLabel = kidProfile ? getKidAgeLabel(kidProfile.ageGroup) : null;
+  const kidPlayStyleLabel = kidProfile ? getKidPlayStyleLabel(kidProfile.playStyle) : null;
+  const isKidProfileSheetOpen = kidProfile === null || isKidProfileEditorOpen;
+  const activeColorId =
+    learningMode === "colors" && gameState.activeItemId
+      ? (gameState.activeItemId as ColorOptionId)
+      : null;
 
   return (
     <main
       className="relative h-[100svh] overflow-hidden px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6"
       style={{ background: gameState.palette.background }}
     >
+      <SiteNav currentPath="/" overlay />
+      <SiteFooter overlay />
+
+      <KidProfileSheet
+        key={kidProfile ? `${kidProfile.ageGroup}-${kidProfile.playStyle}` : "new"}
+        isOpen={isKidProfileSheetOpen}
+        initialProfile={kidProfile}
+        palette={gameState.palette}
+        canClose={kidProfile !== null}
+        onSave={handleSaveKidProfile}
+        onClose={() => setIsKidProfileEditorOpen(false)}
+      />
+
       <ParentSettings
         isOpen={isSettingsOpen}
         onToggle={() => setIsSettingsOpen((currentValue) => !currentValue)}
         onClose={() => setIsSettingsOpen(false)}
+        kidProfile={kidProfile}
+        onOpenKidProfile={() => setIsKidProfileEditorOpen(true)}
         learningMode={learningMode}
         onLearningModeChange={handleLearningModeChange}
         languagePack={selectedLanguagePack}
@@ -454,9 +542,19 @@ export function TypingGame() {
         numberBoardOrder={numberBoardOrder}
         onNumberBoardOrderChange={handleNumberBoardOrderChange}
         showVirtualKeyboard={showVirtualKeyboard}
-        onToggleVirtualKeyboard={() => setShowVirtualKeyboard((currentValue) => !currentValue)}
+        onToggleVirtualKeyboard={() =>
+          updateParentSettings((currentSettings) => ({
+            ...currentSettings,
+            showVirtualKeyboard: !currentSettings.showVirtualKeyboard
+          }))
+        }
         showPlayControls={showPlayControls}
-        onTogglePlayControls={() => setShowPlayControls((currentValue) => !currentValue)}
+        onTogglePlayControls={() =>
+          updateParentSettings((currentSettings) => ({
+            ...currentSettings,
+            showPlayControls: !currentSettings.showPlayControls
+          }))
+        }
         palette={gameState.palette}
       />
 
@@ -500,8 +598,12 @@ export function TypingGame() {
                   immersive={false}
                   constrained
                   previewColor={gameState.previewColor}
+                  activeColorId={activeColorId}
                   activeEnglishLetter={activeEnglishLetter}
                   floatingEchoText={null}
+                  kidProfile={kidProfile}
+                  kidAgeLabel={kidAgeLabel}
+                  kidPlayStyleLabel={kidPlayStyleLabel}
                 />
               </div>
 
@@ -536,8 +638,12 @@ export function TypingGame() {
               immersive={isImmersiveStage}
               constrained={showInputPanel}
               previewColor={gameState.previewColor}
+              activeColorId={activeColorId}
               activeEnglishLetter={activeEnglishLetter}
               floatingEchoText={floatingEchoText}
+              kidProfile={kidProfile}
+              kidAgeLabel={kidAgeLabel}
+              kidPlayStyleLabel={kidPlayStyleLabel}
             />
 
             {showInputPanel ? (

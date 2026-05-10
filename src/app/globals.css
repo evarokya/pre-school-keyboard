@@ -112,6 +112,46 @@ body {
   animation-fill-mode: both;
 }
 
+.scene-drift {
+  animation: sceneDrift 7s ease-in-out infinite;
+}
+
+.scene-drift--delay {
+  animation-delay: -2.4s;
+}
+
+.scene-bob {
+  animation: sceneBob 4.8s ease-in-out infinite;
+}
+
+.scene-bob--delay {
+  animation-delay: -1.4s;
+}
+
+.scene-sway {
+  animation: sceneSway 5.8s ease-in-out infinite;
+}
+
+.scene-sway--delay {
+  animation-delay: -2s;
+}
+
+.scene-pulse {
+  animation: scenePulse 4.2s ease-in-out infinite;
+}
+
+.scene-rain {
+  animation: sceneRain 1.4s linear infinite;
+}
+
+.scene-rain--delay {
+  animation-delay: -0.45s;
+}
+
+.scene-rain--late {
+  animation-delay: -0.9s;
+}
+
 @keyframes drift {
   0%,
   100% {
@@ -187,5 +227,68 @@ body {
   100% {
     opacity: 0;
     transform: translate3d(0, -36px, 0) scale(0.94);
+  }
+}
+
+@keyframes sceneDrift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(10px, -4px, 0);
+  }
+}
+
+@keyframes sceneBob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -7px, 0);
+  }
+}
+
+@keyframes sceneSway {
+  0%,
+  100% {
+    transform: rotate(-4deg) translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: rotate(4deg) translate3d(0, -3px, 0);
+  }
+}
+
+@keyframes scenePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.94;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes sceneRain {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0);
+  }
+
+  25%,
+  80% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(-3px, 14px, 0);
   }
 }

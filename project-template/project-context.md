@@ -6,48 +6,57 @@ This is the project-specific layer that sits on top of the universal boilerplate
 
 ## Product
 
+**Working product name:**
+Nuha Keyboard
+
+**Public-facing name candidate:**
+Nuha Learn & Play
+
 **What it is:**
-A browser-only typing game for a young child. Every key press should show the real key in large text, speak it aloud, and trigger a playful visual reaction with bright colors, emojis, and encouraging messages. The app now also supports language switching and a clickable virtual keyboard so community contributors can expand it over time.
+A browser-only early learning playground for one child. It now covers alphabet learning, computer keyboard familiarity, number practice, and color learning in one playful experience. Parent-friendly controls shape the experience without requiring accounts or any backend.
 
 **Who it's for:**
-One child in a private family setting, primarily on a laptop or tablet with a physical keyboard.
+Families, especially parents helping young children learn letters, colors, numbers, and basic keyboard familiarity at home on a laptop, tablet, or shared computer.
 
 **Core problem it solves:**
-Turn raw keyboard input into immediate, fun feedback so keyboard exploration feels like entertainment instead of study.
+Give children a warmer, more visual, more forgiving way to explore foundational symbols and colors than a traditional school or worksheet-first approach.
 
-**MVP definition of done:**
-The app opens to a single screen, reacts to any key press, speaks the pressed key with friendly wording, updates the colors and reaction UI, keeps the last 10 keys visible, lets the user switch between starter language packs, and offers a clickable virtual keyboard.
-
-A user can: open the app, press any keyboard key, see the key clearly, hear it spoken aloud, and continue pressing keys with updated reactions and recent history.
+**Current product shape:**
+- `Letters` mode: alphabet-focused learning
+- `Computer` mode: keyboard familiarity and simple typing play
+- `Colors` mode: larger color palette with lightweight animated scenes
+- `Numbers` pack inside letter flow: parent-selectable range and order
+- First-visit child setup: age range and play-style preference
+- Family voice path: browser speech plus local child audio assets
+- Public contribute page and share-ready metadata
 
 ---
 
 ## Domain terminology
 
-Define terms specific to this product so agents use consistent language:
-
 | Term | Meaning |
 |---|---|
-| Display text | The exact text shown on screen for the pressed key, such as `A`, `1`, `Space`, or `Esc`. |
-| Speech text | The child-friendly spoken form of the pressed key, such as `A`, `one`, `dot`, or `space`. |
-| Reaction | The combined visual response for a key press: background color, key color, emoji, and encouragement message. |
-| Recent keys | The rolling history of the last 10 key presses shown in the UI. |
-| Language pack | The data definition for one language's dropdown label, voice config, prompts, and virtual keyboard rows. |
-| Voice layer | The playback abstraction that currently uses speech synthesis and can later switch to audio files per language. |
+| Learning focus | The top-level practice mode: `Letters`, `Computer`, or `Colors`. |
+| Language pack | Data describing one language's labels, prompts, voice strategy, and keyboard rows. |
+| Number board | The dedicated numbers-only board with parent-selected range and order. |
+| Child setup | The first-visit profile stored only in the browser, including age band and play style. |
+| Parent settings | The caregiver control sheet for learning mode, language selection, visibility toggles, number range, and child setup edits. |
+| Voice layer | Playback abstraction that can use browser speech, shipped audio assets, or family recordings. |
+| Family voice folder | `public/audio/letters-by-nuha/`, where direct letter recordings like `a.mp4` are picked up automatically. |
+| Color scene | The lightweight animated illustration shown in color mode using the selected color and child profile. |
 
 ---
 
 ## Key runtime models
 
-List the main client-side state models and their purpose:
-
 | Model | Purpose |
 |---|---|
-| `currentKey` | Stores the latest pressed key shown in the large central display. |
-| `recentKeys` | Stores the last 10 display values for the history list. |
-| `reactionState` | Stores the current background color, text color, emoji, and encouragement message. |
-| `audioState` | Stores whether speech is muted and whether the active voice strategy is available. |
-| `selectedLanguagePack` | Stores the current dropdown selection and its virtual keyboard layout. |
+| `gameState` | Stores the current stage content, palette, active item id, message, and preview color. |
+| `kidProfile` | Child age band and play style, stored locally in the browser through a small external-store pattern. |
+| `parentSettingsState` | Saved caregiver settings such as language, learning mode, number range, keyboard visibility, and controls visibility. |
+| `selectedLanguagePack` | The active language pack used for prompts, direction, keyboard rows, and voice behavior. |
+| `voiceState` | Whether voice is muted and whether the current playback strategy is available. |
+| `numberBoardState` | Parent-selected number range and order, persisted in local storage. |
 
 ---
 
@@ -55,51 +64,58 @@ List the main client-side state models and their purpose:
 
 | Service | What it's used for | Auth method |
 |---|---|---|
-| Browser SpeechSynthesis API | Speak the friendly key name aloud after each key press until real audio packs are added. | None |
-| Browser Fullscreen API | Let the child enter a more immersive full-screen mode. | None |
-| HTML Audio | Future open-source child voice playback from local assets or hosted files. | None |
+| Browser SpeechSynthesis API | Speak labels and fall back when audio files are missing. | None |
+| HTML Audio | Play bundled child voice assets and direct family recordings. | None |
+| Browser Fullscreen API | Offer a more immersive play mode. | None |
+| Browser LocalStorage | Persist child setup and parent settings only on the current device/browser. | None |
+| Web Share API | Native share fallback for the contribute page when supported. | None |
+| Social share URLs | Facebook, LinkedIn, and X sharing from the contribute page. | None |
 
 ---
 
 ## Business rules
 
-Constraints that are not obvious from the code:
-
-- Spoken text must match the actual key pressed. Examples: `1 -> one`, `0 -> zero`, `.` -> `dot`, `/ -> slash`.
-- Letters should display in uppercase and speak as their uppercase letter names.
-- Special keys use friendly display and spoken names such as `Space`, `Enter`, `Backspace`, `Shift`, and `Escape`.
-- Each key press should update the display, speech, reaction, and recent history as one coherent interaction.
-- Recent history keeps at most 10 keys.
-- Clear resets the current key, reaction text, and recent history.
-- The app must stay client-side only in version 1.
-- Language packs should be data-driven so contributors can add new scripts without rewriting the game loop.
-- Voice playback should be abstracted so English can later switch to real kid voice files first, then other languages can follow the same pattern.
-- Future parent controls should be able to show all keys or only a selected subset of weak letters from the same language pack.
+- Child setup and parent settings must stay local-only in the browser. No server-side storage.
+- The UI should explain this in natural language because not all caregivers are technical.
+- `Letters` mode for English should stay alphabet-only.
+- `Computer` mode can include broader keyboard keys and floating key feedback.
+- `Numbers` should remain numbers-only and support parent-selected range and order.
+- `Colors` should feel visual, not abstract: the selected color should tint the stage and drive a simple scene.
+- Real family recordings in `public/audio/letters-by-nuha/` should be tried first for English letters if a matching file exists.
+- The voice layer must fall back gracefully through available sources and then speech synthesis.
+- Parent controls should remain understandable and scroll-safe on mobile.
+- Contribute and public-sharing surfaces should look like real project pages, not placeholders.
 
 ---
 
 ## Scope boundaries
 
-### Do not build in version 1
+### Do build in the current phase
 
-- Login, user accounts, parent dashboards, or settings panels
-- Database, cloud sync, analytics, or backend APIs
-- Payments, subscriptions, ads, or public marketing pages
-- AI features, leaderboards, multiplayer, or complex level systems
-- PWA install flow until the core experience is stable
+- Child-first learning modes and parent controls
+- Local-only personalization
+- Family voice recordings and future community voice packs
+- Public contribution surface and social metadata
+
+### Do not build yet
+
+- User accounts, cloud sync, analytics, or admin dashboards
+- Payments, subscriptions, donations backend, or ads
+- Server APIs, databases, or auth flows
+- Complex level systems, AI tutoring, or multiplayer
+- Public CMS/blog system
 
 ### Do not touch
 
 - `universal/` - shared boilerplate guidance that should stay identical across projects
-- `kids_typing_game_development_plan.pdf` - source project brief from the user
+- `kids_typing_game_development_plan.pdf` - original source brief
 
 ---
 
-## Build order
+## Current architecture direction
 
-1. Create the Next.js app shell and the single main screen with a "Press any key!" prompt.
-2. Implement keydown handling plus `getDisplayText` and `getSpeechText`.
-3. Add speech playback, random colors, emoji reactions, and encouragement messages.
-4. Add Mute/Unmute, Clear, and Fullscreen controls.
-5. Add language packs, dropdown switching, and the virtual keyboard.
-6. Keep the voice layer ready for future real audio assets and expand tests for language-pack behavior.
+1. Keep learning content data-driven in `src/lib/`.
+2. Keep family/browser persistence in local external-store helpers, not ad hoc component logic.
+3. Keep stage rendering lightweight and animation restrained so mobile performance stays stable.
+4. Keep every new learning pack compatible with the same display, voice, and parent-control patterns.
+5. Keep public-facing pieces such as metadata, nav, footer, and contribution page aligned with the actual product state.

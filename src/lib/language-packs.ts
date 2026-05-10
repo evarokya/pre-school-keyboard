@@ -13,6 +13,11 @@ export type AudioFilesVoiceConfig = {
   basePath: string;
   extension?: "mp3" | "wav" | "ogg";
   manifestPath?: string;
+  additionalSources?: {
+    basePath: string;
+    extension?: "mp3" | "wav" | "ogg";
+    manifestPath?: string;
+  }[];
   fallback?: SpeechSynthesisVoiceConfig;
 };
 
@@ -38,6 +43,7 @@ export type LanguagePack = {
   prompt: string;
   hint: string;
   voice: VoiceConfig;
+  allowGenericInput?: boolean;
   rows: readonly (readonly LanguageKey[])[];
 };
 
@@ -73,6 +79,91 @@ const NUMBERS_CHILD_VOICE: AudioFilesVoiceConfig = {
   fallback: ENGLISH_VOICE
 };
 
+const NUMBERS_CHILD_AUDIO_SOURCE = {
+  basePath: "/audio/numbers-child-v1",
+  extension: "wav" as const,
+  manifestPath: "/audio/numbers-child-v1/manifest.json"
+};
+
+ENGLISH_COMMUNITY_VOICE.additionalSources = [NUMBERS_CHILD_AUDIO_SOURCE];
+
+const ENGLISH_LETTER_ROWS = [
+  [
+    key("q", { label: "Q" }),
+    key("w", { label: "W" }),
+    key("e", { label: "E" }),
+    key("r", { label: "R" }),
+    key("t", { label: "T" }),
+    key("y", { label: "Y" }),
+    key("u", { label: "U" }),
+    key("i", { label: "I" }),
+    key("o", { label: "O" }),
+    key("p", { label: "P" })
+  ],
+  [
+    key("a", { label: "A" }),
+    key("s", { label: "S" }),
+    key("d", { label: "D" }),
+    key("f", { label: "F" }),
+    key("g", { label: "G" }),
+    key("h", { label: "H" }),
+    key("j", { label: "J" }),
+    key("k", { label: "K" }),
+    key("l", { label: "L" })
+  ],
+  [
+    key("z", { label: "Z" }),
+    key("x", { label: "X" }),
+    key("c", { label: "C" }),
+    key("v", { label: "V" }),
+    key("b", { label: "B" }),
+    key("n", { label: "N" }),
+    key("m", { label: "M" })
+  ]
+] as const;
+
+const ENGLISH_COMPUTER_ROWS = [
+  [
+    key("1", { label: "1", assetKey: "one" }),
+    key("2", { label: "2", assetKey: "two" }),
+    key("3", { label: "3", assetKey: "three" }),
+    key("4", { label: "4", assetKey: "four" }),
+    key("5", { label: "5", assetKey: "five" }),
+    key("6", { label: "6", assetKey: "six" }),
+    key("7", { label: "7", assetKey: "seven" }),
+    key("8", { label: "8", assetKey: "eight" }),
+    key("9", { label: "9", assetKey: "nine" }),
+    key("0", { label: "0", assetKey: "zero" }),
+    key("-", { label: "-", assetKey: "dash" }),
+    key("=", { label: "=", assetKey: "equals" })
+  ],
+  [
+    key("Tab", { label: "Tab", size: "wide" }),
+    ...ENGLISH_LETTER_ROWS[0]
+  ],
+  [
+    ...ENGLISH_LETTER_ROWS[1],
+    key("Enter", { label: "Enter", size: "wide" })
+  ],
+  [
+    key("Shift", { label: "Shift", size: "wide" }),
+    ...ENGLISH_LETTER_ROWS[2],
+    key(".", { label: ".", assetKey: "dot" }),
+    key(",", { label: ",", assetKey: "comma" }),
+    key("/", { label: "/", assetKey: "slash" }),
+    key("Backspace", { label: "Backspace", size: "wide" })
+  ],
+  [
+    key(" ", {
+      label: "Space",
+      displayText: "Space",
+      speechText: "space",
+      assetKey: "space",
+      size: "full"
+    })
+  ]
+] as const;
+
 const ARABIC_VOICE: SpeechSynthesisVoiceConfig = {
   type: "speech-synthesis",
   lang: "ar",
@@ -94,11 +185,23 @@ export const LANGUAGE_PACKS: readonly LanguagePack[] = [
     id: "english",
     label: "English",
     nativeLabel: "English",
-    description: "The starter pack with letters, digits, punctuation, and a wide space key.",
+    description: "An alphabet-only starter pack focused on English letters.",
     direction: "ltr",
-    prompt: "Press any key or click the English keyboard.",
-    hint: "Letters, numbers, Space, Enter, and punctuation all work.",
+    prompt: "Press a letter key or click the alphabet board.",
+    hint: "English letter mode now stays focused on A to Z.",
     voice: ENGLISH_COMMUNITY_VOICE,
+    rows: ENGLISH_LETTER_ROWS
+  },
+  {
+    id: "numbers",
+    label: "Numbers",
+    nativeLabel: "123",
+    description: "A simple counting board focused only on numbers.",
+    direction: "ltr",
+    prompt: "Count with taps or number keys.",
+    hint: "Number mode now stays focused on numbers while keyboard symbols live in Computer mode.",
+    voice: NUMBERS_CHILD_VOICE,
+    allowGenericInput: false,
     rows: [
       [
         key("1", { label: "1", assetKey: "one" }),
@@ -106,96 +209,13 @@ export const LANGUAGE_PACKS: readonly LanguagePack[] = [
         key("3", { label: "3", assetKey: "three" }),
         key("4", { label: "4", assetKey: "four" }),
         key("5", { label: "5", assetKey: "five" }),
-        key("6", { label: "6", assetKey: "six" }),
-        key("7", { label: "7", assetKey: "seven" }),
-        key("8", { label: "8", assetKey: "eight" }),
-        key("9", { label: "9", assetKey: "nine" }),
         key("0", { label: "0", assetKey: "zero" })
-      ],
-      [
-        key("q", { label: "Q" }),
-        key("w", { label: "W" }),
-        key("e", { label: "E" }),
-        key("r", { label: "R" }),
-        key("t", { label: "T" }),
-        key("y", { label: "Y" }),
-        key("u", { label: "U" }),
-        key("i", { label: "I" }),
-        key("o", { label: "O" }),
-        key("p", { label: "P" })
-      ],
-      [
-        key("a", { label: "A" }),
-        key("s", { label: "S" }),
-        key("d", { label: "D" }),
-        key("f", { label: "F" }),
-        key("g", { label: "G" }),
-        key("h", { label: "H" }),
-        key("j", { label: "J" }),
-        key("k", { label: "K" }),
-        key("l", { label: "L" })
-      ],
-      [
-        key("z", { label: "Z" }),
-        key("x", { label: "X" }),
-        key("c", { label: "C" }),
-        key("v", { label: "V" }),
-        key("b", { label: "B" }),
-        key("n", { label: "N" }),
-        key("m", { label: "M" }),
-        key(".", { label: ".", assetKey: "dot" }),
-        key(",", { label: ",", assetKey: "comma" }),
-        key("/", { label: "/", assetKey: "slash" }),
-        key(";", { label: ";", assetKey: "semicolon" })
-      ],
-      [
-        key(" ", {
-          label: "Space",
-          displayText: "Space",
-          speechText: "space",
-          assetKey: "space",
-          size: "full"
-        })
-      ]
-    ]
-  },
-  {
-    id: "numbers",
-    label: "Numbers",
-    nativeLabel: "123",
-    description: "A simple counting board focused on digits and a few familiar symbols.",
-    direction: "ltr",
-    prompt: "Count with clicks or number keys.",
-    hint: "Use the number row or click the big buttons. One to nine now use a real child voice.",
-    voice: NUMBERS_CHILD_VOICE,
-    rows: [
-      [
-        key("1", { label: "1", assetKey: "one" }),
-        key("2", { label: "2", assetKey: "two" }),
-        key("3", { label: "3", assetKey: "three" }),
-        key("4", { label: "4", assetKey: "four" }),
-        key("5", { label: "5", assetKey: "five" })
       ],
       [
         key("6", { label: "6", assetKey: "six" }),
         key("7", { label: "7", assetKey: "seven" }),
         key("8", { label: "8", assetKey: "eight" }),
-        key("9", { label: "9", assetKey: "nine" }),
-        key("0", { label: "0", assetKey: "zero" })
-      ],
-      [
-        key(".", { label: ".", assetKey: "dot" }),
-        key(",", { label: ",", assetKey: "comma" }),
-        key("?", { label: "?", assetKey: "question-mark" })
-      ],
-      [
-        key(" ", {
-          label: "Space",
-          displayText: "Space",
-          speechText: "space",
-          assetKey: "space",
-          size: "full"
-        })
+        key("9", { label: "9", assetKey: "nine" })
       ]
     ]
   },
@@ -208,6 +228,7 @@ export const LANGUAGE_PACKS: readonly LanguagePack[] = [
     prompt: "اضغط أي مفتاح أو انقر على لوحة المفاتيح العربية.",
     hint: "انقر على الحروف العربية أو استخدم تخطيط لوحة مفاتيح عربي.",
     voice: ARABIC_VOICE,
+    allowGenericInput: false,
     rows: [
       [
         key("ض"),
@@ -269,6 +290,7 @@ export const LANGUAGE_PACKS: readonly LanguagePack[] = [
     prompt: "কীবোর্ডে চাপ দাও বা বাংলা কীগুলোতে ক্লিক করো।",
     hint: "বাংলা কীগুলোতে ক্লিক করো, বা বাংলা হার্ডওয়্যার লেআউট ব্যবহার করো।",
     voice: BENGALI_VOICE,
+    allowGenericInput: false,
     rows: [
       [
         key("অ"),
@@ -332,6 +354,19 @@ export const LANGUAGE_PACKS: readonly LanguagePack[] = [
     ]
   }
 ] as const;
+
+export const ENGLISH_COMPUTER_PRACTICE_PACK: LanguagePack = {
+  id: "english",
+  label: "Computer",
+  nativeLabel: "Keyboard",
+  description: "A keyboard practice board with letters, digits, symbols, and simple computer keys.",
+  direction: "ltr",
+  prompt: "Press any computer key or tap the practice board.",
+  hint: "Letters, numbers, Space, Enter, Tab, Shift, and simple symbols all work here.",
+  voice: ENGLISH_COMMUNITY_VOICE,
+  allowGenericInput: true,
+  rows: ENGLISH_COMPUTER_ROWS
+};
 
 export const DEFAULT_LANGUAGE_ID: LanguagePackId = "english";
 

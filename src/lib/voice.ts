@@ -10,6 +10,12 @@ type SpeakRequest = {
 let activeAudio: HTMLAudioElement | null = null;
 const audioManifestCache = new Map<string, Promise<Set<string>>>();
 
+type AudioSource = {
+  basePath: string;
+  extension?: "mp3" | "wav" | "ogg";
+  manifestPath?: string;
+};
+
 export function canUseSpeechSynthesis(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
@@ -19,19 +25,19 @@ function canUseHtmlAudio(): boolean {
 }
 
 async function loadAudioManifest(
-  voice: Extract<VoiceConfig, { type: "audio-files" }>
+  source: AudioSource
 ): Promise<Set<string>> {
-  if (!voice.manifestPath || typeof fetch === "undefined") {
+  if (!source.manifestPath || typeof fetch === "undefined") {
     return new Set();
   }
 
-  const cachedManifest = audioManifestCache.get(voice.manifestPath);
+  const cachedManifest = audioManifestCache.get(source.manifestPath);
 
   if (cachedManifest) {
     return cachedManifest;
   }
 
-  const manifestPromise = fetch(voice.manifestPath, { cache: "no-store" })
+  const manifestPromise = fetch(source.manifestPath, { cache: "no-store" })
     .then(async (response) => {
       if (!response.ok) {
         return new Set<string>();
@@ -49,9 +55,22 @@ async function loadAudioManifest(
     })
     .catch(() => new Set<string>());
 
-  audioManifestCache.set(voice.manifestPath, manifestPromise);
+  audioManifestCache.set(source.manifestPath, manifestPromise);
 
   return manifestPromise;
+}
+
+function getAudioSources(
+  voice: Extract<VoiceConfig, { type: "audio-files" }>
+): AudioSource[] {
+  return [
+    {
+      basePath: voice.basePath,
+      extension: voice.extension,
+      manifestPath: voice.manifestPath
+    },
+    ...(voice.additionalSources ?? [])
+  ];
 }
 
 export function isVoicePlaybackAvailable(voice: VoiceConfig): boolean {
@@ -102,18 +121,27 @@ async function speakWithAudioFiles(
     throw new Error("HTML audio is not available in this browser.");
   }
 
-  const availableAssetKeys = await loadAudioManifest(voice);
+  for (const source of getAudioSources(voice)) {
+    const availableAssetKeys = await loadAudioManifest(source);
 
-  if (voice.manifestPath && !availableAssetKeys.has(assetKey)) {
-    return false;
+    if (source.manifestPath && !availableAssetKeys.has(assetKey)) {
+      continue;
+    }
+
+    const fileExtension = source.extension ?? "mp3";
+    const audio = new Audio(`${source.basePath}/${assetKey}.${fileExtension}`);
+
+    activeAudio = audio;
+
+    try {
+      await audio.play();
+      return true;
+    } catch {
+      activeAudio = null;
+    }
   }
 
-  const fileExtension = voice.extension ?? "mp3";
-  const audio = new Audio(`${voice.basePath}/${assetKey}.${fileExtension}`);
-
-  activeAudio = audio;
-  await audio.play();
-  return true;
+  return false;
 }
 
 export async function speakWithVoice(request: SpeakRequest): Promise<void> {

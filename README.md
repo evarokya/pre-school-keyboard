@@ -1,22 +1,23 @@
 # Nuha Keyboard
 
-A playful browser typing game for one child. Each key press should feel immediate and fun: show the actual key in large text, speak it aloud, change the colors, and show a friendly emoji reaction.
+A playful browser learning game for one child. Each tap or key press should feel immediate and fun: show the active item in large text, speak it aloud, change the colors, and show a friendly emoji reaction.
 
 ## Status
 
-This repository has been prepared from the `pre-school-keyboard` template for the new project context in [kids_typing_game_development_plan.pdf](kids_typing_game_development_plan.pdf). The current build includes a playable browser app, starter language packs, a virtual keyboard, and a voice layer that can later move from browser synthesis to real open-source child voice files.
+This repository has been prepared from the `pre-school-keyboard` template for the new project context in [kids_typing_game_development_plan.pdf](kids_typing_game_development_plan.pdf). The current build includes a playable browser app, parent settings, learning-mode switching, starter language packs, and a voice layer that can later move from browser synthesis to real open-source child voice files.
 
 ## Version 1 scope
 
-- One main screen with a clear "Press any key!" prompt
-- Display the actual pressed key in very large text
-- Speak the key aloud with child-friendly wording
-- Rotate bright or pastel background and text colors on each key press
-- Show a random emoji and encouragement message
-- Keep recent history of the last 10 keys
-- Provide Mute/Unmute, Clear, and Fullscreen controls
-- Switch between English, Numbers, Arabic, and Bengali from a dropdown
-- Offer a clickable virtual keyboard for mouse and touch input
+- One main screen with a clear child-friendly prompt
+- Parent settings with learning focus, language selection, and display controls
+- Display the active letter, number, or color in very large text
+- Speak the active item aloud with child-friendly wording
+- Rotate soft palettes, emojis, and encouragement messages
+- English letters mode focused on alphabet keys only
+- Computer mode for full keyboard practice with floating key feedback
+- Numbers mode with a dedicated counting board from `1-10`, `1-20`, `1-50`, or `1-100`
+- Numbers mode supports straight, reverse, or random number order
+- Colors mode with a tap-ready color bar and a softly tinted stage
 - No backend, database, auth, analytics, payments, or complex game modes
 
 ## Planned app structure
@@ -29,6 +30,7 @@ src/
     page.tsx
   components/
     BigKeyDisplay.tsx
+    NumberBoard.tsx
     ControlButtons.tsx
     LanguageSelector.tsx
     RecentKeys.tsx
@@ -39,6 +41,7 @@ src/
     getDisplayText.ts
     getSpeechText.ts
     language-packs.ts
+    numbers.ts
     random.ts
     resolveLanguageKey.ts
     voice.ts
@@ -57,8 +60,9 @@ src/
 - New languages should be added as language packs in `src/lib/language-packs.ts`.
 - English and Numbers now support an optional community voice-pack path in `public/audio/english-community-v1/`, with browser speech as fallback.
 - Numbers already include a first real child-voice subset in `public/audio/numbers-child-v1/` for `1` to `9`, with `0` still falling back to browser speech.
+- English computer mode now reuses those same child number clips for digit keys while letter clips are still added separately.
 - Future real child voice assets should start with English, then expand to other packs through the shared voice abstraction in `src/lib/voice.ts`.
-- The language-pack rows are already filterable so future parent controls can show either a full keyboard or only selected weak letters.
+- The learning modes are already split so future parent controls can show only selected weak letters or custom keyboard subsets.
 
 ## Local testing
 
@@ -76,19 +80,18 @@ pnpm dev
 
 3. Open `http://localhost:3000`.
 
-4. Manual checks for version 1:
+4. Manual checks for the current build:
 
-- The page shows `Press any key!` before any input
-- Switch the dropdown between English, Numbers, Arabic, and Bengali
-- Click several keys from the virtual keyboard and confirm they behave the same as physical keys
-- Press `A` and confirm it displays `A` and speaks `A`
-- Press `1` and confirm it displays `1` and speaks `one`
-- In `Numbers` mode, confirm `1` to `9` use the shipped child voice clips
-- Press `.` and confirm it displays `.` and speaks `dot`
-- Press `Space` and confirm it displays `Space` and speaks `space`
-- Confirm the background, emoji, and encouragement message change on each key press
-- Confirm the recent history updates and keeps only the last 10 keys
-- Confirm `Mute voice`, `Clear screen`, and `Go fullscreen` work
+- Open the parent settings button in the top-right corner
+- Switch learning focus between `Letters`, `Computer`, and `Colors`
+- In `Letters`, switch between English, Numbers, Arabic, and Bengali
+- In English letters mode, confirm only alphabet keys are shown
+- Press `A` and confirm it displays `A`, speaks `A`, and shows capital/small variants
+- In `Computer`, press `.` or `Enter` and confirm full keyboard practice works with floating feedback
+- In `Numbers`, change the range and order in parent settings and confirm the board updates
+- In `Numbers`, confirm `1` to `10` can use the shipped child voice clips and higher numbers fall back cleanly
+- In `Colors`, tap a color and confirm the main stage softly tints toward that color
+- Confirm `Mute voice`, `Clear screen`, and `Go fullscreen` still work
 
 5. Automated checks:
 

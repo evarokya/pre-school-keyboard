@@ -159,6 +159,10 @@ export function resolveLanguageInput(
     return resolveFromDefinition(languagePack, packSpecificKey);
   }
 
+  if (!languagePack.allowGenericInput) {
+    return null;
+  }
+
   if (!isSupportedGenericKey(value)) {
     return null;
   }

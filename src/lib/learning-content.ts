@@ -1,6 +1,6 @@
 import type { LanguagePackId, TextDirection } from "./language-packs";
 
-export type LearningMode = "letters" | "colors";
+export type LearningMode = "letters" | "computer" | "colors";
 
 export type ColorOptionId =
   | "red"
@@ -55,7 +55,12 @@ export const LEARNING_MODE_OPTIONS: readonly LearningModeOption[] = [
   {
     id: "letters",
     label: "Letters",
-    description: "Use the keyboard and hear each key name."
+    description: "Stay focused on alphabet letters and their sounds."
+  },
+  {
+    id: "computer",
+    label: "Computer",
+    description: "Practice a real keyboard with fun floating key feedback."
   },
   {
     id: "colors",
@@ -68,6 +73,7 @@ const LEARNING_COPY: Record<LearningCopyLanguage, LearningCopy> = {
   english: {
     modeLabels: {
       letters: "Letters",
+      computer: "Computer",
       colors: "Colors"
     },
     colorPrompt: "Tap a color to hear its name.",
@@ -76,6 +82,7 @@ const LEARNING_COPY: Record<LearningCopyLanguage, LearningCopy> = {
   arabic: {
     modeLabels: {
       letters: "حروف",
+      computer: "كمبيوتر",
       colors: "ألوان"
     },
     colorPrompt: "اضغط على لون لسماع اسمه.",
@@ -84,6 +91,7 @@ const LEARNING_COPY: Record<LearningCopyLanguage, LearningCopy> = {
   bengali: {
     modeLabels: {
       letters: "অক্ষর",
+      computer: "কম্পিউটার",
       colors: "রং"
     },
     colorPrompt: "একটি রঙে ট্যাপ করো, নামটি শোনো।",

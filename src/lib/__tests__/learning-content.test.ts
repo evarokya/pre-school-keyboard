@@ -20,6 +20,7 @@ describe("learning content", () => {
 
   it("returns localized color mode labels and prompts", () => {
     expect(getLearningModeLabel("colors", "arabic")).toBe("ألوان");
+    expect(getLearningModeLabel("computer", "bengali")).toBe("কম্পিউটার");
     expect(getColorLearningContent("arabic")).toMatchObject({
       direction: "rtl",
       prompt: "اضغط على لون لسماع اسمه."

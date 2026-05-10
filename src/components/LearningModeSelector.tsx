@@ -32,7 +32,7 @@ export function LearningModeSelector({
         </p>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
         {LEARNING_MODE_OPTIONS.map((option) => {
           const isActive = option.id === learningMode;
 

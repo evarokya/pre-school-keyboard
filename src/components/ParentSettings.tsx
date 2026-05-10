@@ -5,6 +5,11 @@ import { LearningModeSelector } from "@/components/LearningModeSelector";
 import type { Palette } from "@/lib/constants";
 import type { LearningMode } from "@/lib/learning-content";
 import type { LanguagePack, LanguagePackId } from "@/lib/language-packs";
+import {
+  NUMBER_RANGE_OPTIONS,
+  type NumberBoardOrder,
+  type NumberRangeMax
+} from "@/lib/numbers";
 
 type ParentSettingsProps = {
   isOpen: boolean;
@@ -14,6 +19,10 @@ type ParentSettingsProps = {
   onLearningModeChange: (learningMode: LearningMode) => void;
   languagePack: LanguagePack;
   onLanguageChange: (languageId: LanguagePackId) => void;
+  numberRangeMax: NumberRangeMax;
+  onNumberRangeChange: (maxNumber: NumberRangeMax) => void;
+  numberBoardOrder: NumberBoardOrder;
+  onNumberBoardOrderChange: (order: NumberBoardOrder) => void;
   showVirtualKeyboard: boolean;
   onToggleVirtualKeyboard: () => void;
   showPlayControls: boolean;
@@ -120,6 +129,10 @@ export function ParentSettings({
   onLearningModeChange,
   languagePack,
   onLanguageChange,
+  numberRangeMax,
+  onNumberRangeChange,
+  numberBoardOrder,
+  onNumberBoardOrderChange,
   showVirtualKeyboard,
   onToggleVirtualKeyboard,
   showPlayControls,
@@ -209,14 +222,110 @@ export function ParentSettings({
                 palette={palette}
               />
 
-              <LanguageSelector
-                languagePack={languagePack}
-                onChange={onLanguageChange}
-                palette={palette}
-                compact
-              />
+              {learningMode === "computer" ? (
+                <div
+                  className="rounded-[1.4rem] border px-4 py-4"
+                  style={{
+                    background: palette.buttonSurface,
+                    borderColor: palette.buttonBorder
+                  }}
+                >
+                  <p className="font-display text-2xl tracking-[-0.04em]" style={{ color: palette.keyText }}>
+                    Computer basics
+                  </p>
+                  <p className="mt-1 text-sm font-bold leading-6" style={{ color: palette.detailText }}>
+                    Keyboard practice uses the English computer board for now so kids can learn common keys first.
+                  </p>
+                </div>
+              ) : (
+                <LanguageSelector
+                  languagePack={languagePack}
+                  onChange={onLanguageChange}
+                  palette={palette}
+                  compact
+                />
+              )}
 
-              {learningMode === "letters" ? (
+              {learningMode === "letters" && languagePack.id === "numbers" ? (
+                <div
+                  className="rounded-[1.4rem] border px-4 py-4"
+                  style={{
+                    background: palette.buttonSurface,
+                    borderColor: palette.buttonBorder
+                  }}
+                >
+                  <p className="font-display text-2xl tracking-[-0.04em]" style={{ color: palette.keyText }}>
+                    Number range
+                  </p>
+                  <p className="mt-1 text-sm font-bold leading-6" style={{ color: palette.detailText }}>
+                    Pick how far the counting board should go. Number mode stays numbers-only.
+                  </p>
+
+                  <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {NUMBER_RANGE_OPTIONS.map((option) => {
+                      const isActive = option === numberRangeMax;
+
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => onNumberRangeChange(option)}
+                          className={`rounded-[1.2rem] border px-3 py-3 text-left transition ${
+                            isActive ? "scale-[1.01]" : "hover:-translate-y-0.5"
+                          }`}
+                          style={{
+                            background: isActive ? palette.activeKeySurface : palette.shell,
+                            borderColor: isActive ? palette.activeKeyBorder : palette.buttonBorder,
+                            color: isActive ? palette.activeKeyText : palette.buttonText,
+                            boxShadow: isActive ? `0 14px 26px ${palette.activeKeyGlow}` : undefined
+                          }}
+                          aria-pressed={isActive}
+                        >
+                          <p className="font-display text-2xl tracking-[-0.04em]">{`1-${option}`}</p>
+                          <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] opacity-85">
+                            Counting board
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-3 gap-2">
+                    {(["ascending", "descending", "random"] as const).map((option) => {
+                      const isActive = option === numberBoardOrder;
+                      const label =
+                        option === "ascending"
+                          ? "Straight"
+                          : option === "descending"
+                            ? "Reverse"
+                            : "Random";
+
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => onNumberBoardOrderChange(option)}
+                          className={`rounded-[1.2rem] border px-3 py-3 text-left transition ${
+                            isActive ? "scale-[1.01]" : "hover:-translate-y-0.5"
+                          }`}
+                          style={{
+                            background: isActive ? palette.activeKeySurface : palette.shell,
+                            borderColor: isActive ? palette.activeKeyBorder : palette.buttonBorder,
+                            color: isActive ? palette.activeKeyText : palette.buttonText,
+                            boxShadow: isActive ? `0 14px 26px ${palette.activeKeyGlow}` : undefined
+                          }}
+                          aria-pressed={isActive}
+                        >
+                          <p className="font-display text-2xl tracking-[-0.04em]">{label}</p>
+                          <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] opacity-85">
+                            Order
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : learningMode === "letters" ? (
                 <ToggleRow
                   label="Virtual keyboard"
                   description="Show or hide the clickable keyboard for mouse and touch play."
@@ -224,6 +333,21 @@ export function ParentSettings({
                   onToggle={onToggleVirtualKeyboard}
                   palette={palette}
                 />
+              ) : learningMode === "computer" ? (
+                <div
+                  className="rounded-[1.4rem] border px-4 py-4"
+                  style={{
+                    background: palette.buttonSurface,
+                    borderColor: palette.buttonBorder
+                  }}
+                >
+                  <p className="font-display text-2xl tracking-[-0.04em]" style={{ color: palette.keyText }}>
+                    Practice keyboard
+                  </p>
+                  <p className="mt-1 text-sm font-bold leading-6" style={{ color: palette.detailText }}>
+                    Computer mode keeps the keyboard visible so children can match real keys with the screen.
+                  </p>
+                </div>
               ) : (
                 <div
                   className="rounded-[1.4rem] border px-4 py-4"

@@ -100,6 +100,18 @@ body {
   animation: softRise 680ms ease-out both;
 }
 
+.key-echo {
+  display: inline-flex;
+  min-width: 3.2rem;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  opacity: 0;
+  animation-name: keyEcho;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
 @keyframes drift {
   0%,
   100% {
@@ -153,5 +165,27 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes keyEcho {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.86);
+  }
+
+  18% {
+    opacity: 0.9;
+    transform: translate3d(0, -2px, 0) scale(1);
+  }
+
+  72% {
+    opacity: 0.7;
+    transform: translate3d(0, -18px, 0) scale(1.04);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -36px, 0) scale(0.94);
   }
 }

@@ -17,7 +17,16 @@ type BigKeyDisplayProps = {
   immersive?: boolean;
   constrained?: boolean;
   previewColor?: string | null;
+  activeEnglishLetter?: string | null;
+  floatingEchoText?: string | null;
 };
+
+const FLOATING_ECHOES = [
+  { className: "left-[4%] top-[8%] -rotate-12", delay: "0ms", duration: "4800ms" },
+  { className: "right-[6%] top-[14%] rotate-8", delay: "120ms", duration: "4400ms" },
+  { className: "left-[12%] bottom-[18%] rotate-6", delay: "220ms", duration: "5100ms" },
+  { className: "right-[12%] bottom-[12%] -rotate-9", delay: "320ms", duration: "4700ms" }
+] as const;
 
 export function BigKeyDisplay({
   displayText,
@@ -35,9 +44,14 @@ export function BigKeyDisplay({
   idleHint,
   immersive = false,
   constrained = false,
-  previewColor = null
+  previewColor = null,
+  activeEnglishLetter = null,
+  floatingEchoText = null
 }: BigKeyDisplayProps) {
   const isIdle = displayText === null;
+  const uppercaseLetter = activeEnglishLetter?.toUpperCase() ?? null;
+  const lowercaseLetter = activeEnglishLetter?.toLowerCase() ?? null;
+  const showEnglishLetterForms = uppercaseLetter !== null && lowercaseLetter !== null;
   const displayTextClasses = displayText
     ? immersive
       ? "text-[clamp(6rem,24vw,16rem)]"
@@ -61,12 +75,16 @@ export function BigKeyDisplay({
     : constrained
       ? "mt-3 text-[clamp(1.7rem,4.6vw,2.8rem)]"
       : "mt-4 text-3xl sm:text-4xl";
+  const letterCardClasses =
+    "rounded-[1.35rem] border px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-sm";
 
   return (
     <section
       className={`play-surface stage-entrance flex w-full ${stageHeightClasses} flex-col justify-between rounded-[2.5rem] border px-5 py-5 shadow-[0_26px_80px_rgba(255,255,255,0.18)] backdrop-blur-xl sm:px-8 sm:py-7 lg:px-10 lg:py-8`}
       style={{
-        background: palette.shell,
+        background: previewColor
+          ? `linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.5)), ${previewColor}`
+          : palette.shell,
         borderColor: palette.shellBorder
       }}
     >
@@ -154,15 +172,37 @@ export function BigKeyDisplay({
             )}
           </div>
 
-          <div
-            className={`font-display ${displayTextClasses} leading-[0.82] tracking-[-0.08em]`}
-            style={{
-              color: palette.keyText,
-              textShadow: `0 18px 55px ${palette.keyShadow}`
-            }}
-            dir={displayDirection}
-          >
-            {displayText ?? idlePrompt}
+          <div className="relative isolate mt-1 w-full">
+            {floatingEchoText && !isIdle ? (
+              <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+                {FLOATING_ECHOES.map((echo, index) => (
+                  <span
+                    key={`${burstKey}-${index}`}
+                    className={`key-echo absolute font-display text-[clamp(1.4rem,4vw,2.8rem)] ${echo.className}`}
+                    style={{
+                      color: palette.badgeText,
+                      background: palette.badgeSurface,
+                      animationDelay: echo.delay,
+                      animationDuration: echo.duration,
+                      boxShadow: `0 18px 35px ${palette.keyShadow}`
+                    }}
+                  >
+                    {floatingEchoText}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
+            <div
+              className={`relative z-10 font-display ${displayTextClasses} leading-[0.82] tracking-[-0.08em]`}
+              style={{
+                color: palette.keyText,
+                textShadow: `0 18px 55px ${palette.keyShadow}`
+              }}
+              dir={displayDirection}
+            >
+              {displayText ?? idlePrompt}
+            </div>
           </div>
 
           <p
@@ -177,8 +217,70 @@ export function BigKeyDisplay({
             style={{ color: palette.detailText }}
             aria-live="polite"
           >
-            {speechText ? `Says ${speechText}` : idleHint}
+            {speechText
+              ? showEnglishLetterForms
+                ? `Capital ${uppercaseLetter} and small ${lowercaseLetter}.`
+                : `Says ${speechText}`
+              : idleHint}
           </p>
+
+          {showEnglishLetterForms ? (
+            <div className="mt-4 grid w-full max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+              <div
+                className={letterCardClasses}
+                style={{ background: palette.buttonSurface, borderColor: palette.buttonBorder }}
+              >
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em]" style={{ color: palette.detailText }}>
+                  Capital
+                </p>
+                <p className="mt-2 font-display text-5xl leading-none" style={{ color: palette.keyText }}>
+                  {uppercaseLetter}
+                </p>
+              </div>
+
+              <div
+                className={letterCardClasses}
+                style={{ background: palette.buttonSurface, borderColor: palette.buttonBorder }}
+              >
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em]" style={{ color: palette.detailText }}>
+                  Small
+                </p>
+                <p className="mt-2 font-body text-5xl font-extrabold leading-none" style={{ color: palette.keyText }}>
+                  {lowercaseLetter}
+                </p>
+              </div>
+
+              <div
+                className={letterCardClasses}
+                style={{ background: palette.buttonSurface, borderColor: palette.buttonBorder }}
+              >
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em]" style={{ color: palette.detailText }}>
+                  Handwriting
+                </p>
+                <p
+                  className="mt-2 text-5xl italic leading-none"
+                  style={{ color: palette.keyText, fontFamily: '"Comic Sans MS", "Marker Felt", cursive' }}
+                >
+                  {lowercaseLetter}
+                </p>
+              </div>
+
+              <div
+                className={letterCardClasses}
+                style={{ background: palette.buttonSurface, borderColor: palette.buttonBorder }}
+              >
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em]" style={{ color: palette.detailText }}>
+                  Trace
+                </p>
+                <p
+                  className="mt-2 font-display text-4xl leading-none tracking-[0.18em] text-transparent"
+                  style={{ WebkitTextStroke: `1.6px ${palette.keyText}` }}
+                >
+                  {`${uppercaseLetter}${lowercaseLetter}${lowercaseLetter}`}
+                </p>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

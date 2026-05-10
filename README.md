@@ -58,7 +58,8 @@ src/
 
 - `LICENSE` uses MIT so contributors can extend the project.
 - New languages should be added as language packs in `src/lib/language-packs.ts`.
-- English and Numbers now support an optional community voice-pack path in `public/audio/english-community-v1/`, with browser speech as fallback.
+- English now checks `public/audio/letters-by-nuha/` first for direct `a.mp4`, `b.mp4`, `c.mp4` style letter recordings before falling back to the shared community pack.
+- English and Numbers still support the optional community voice-pack path in `public/audio/english-community-v1/`, with browser speech as fallback.
 - Numbers already include a first real child-voice subset in `public/audio/numbers-child-v1/` for `1` to `9`, with `0` still falling back to browser speech.
 - English computer mode now reuses those same child number clips for digit keys while letter clips are still added separately.
 - Future real child voice assets should start with English, then expand to other packs through the shared voice abstraction in `src/lib/voice.ts`.
@@ -86,6 +87,7 @@ pnpm dev
 - Switch learning focus between `Letters`, `Computer`, and `Colors`
 - In `Letters`, switch between English, Numbers, Arabic, and Bengali
 - In English letters mode, confirm only alphabet keys are shown
+- Add `public/audio/letters-by-nuha/d.mp4`, press `D`, and confirm the app prefers that recording over browser speech
 - Press `A` and confirm it displays `A`, speaks `A`, and shows capital/small variants
 - In `Computer`, press `.` or `Enter` and confirm full keyboard practice works with floating feedback
 - In `Numbers`, change the range and order in parent settings and confirm the board updates

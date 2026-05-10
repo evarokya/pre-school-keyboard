@@ -8,14 +8,16 @@ export type SpeechSynthesisVoiceConfig = {
   volume?: number;
 };
 
+export type AudioFileExtension = "mp3" | "wav" | "ogg" | "mp4";
+
 export type AudioFilesVoiceConfig = {
   type: "audio-files";
   basePath: string;
-  extension?: "mp3" | "wav" | "ogg";
+  extension?: AudioFileExtension;
   manifestPath?: string;
   additionalSources?: {
     basePath: string;
-    extension?: "mp3" | "wav" | "ogg";
+    extension?: AudioFileExtension;
     manifestPath?: string;
   }[];
   fallback?: SpeechSynthesisVoiceConfig;
@@ -66,9 +68,14 @@ const ENGLISH_VOICE: SpeechSynthesisVoiceConfig = {
 
 const ENGLISH_COMMUNITY_VOICE: AudioFilesVoiceConfig = {
   type: "audio-files",
-  basePath: "/audio/english-community-v1",
-  manifestPath: "/audio/english-community-v1/manifest.json",
+  basePath: "/audio/letters-by-nuha",
+  extension: "mp4",
   fallback: ENGLISH_VOICE
+};
+
+const ENGLISH_COMMUNITY_AUDIO_SOURCE = {
+  basePath: "/audio/english-community-v1",
+  manifestPath: "/audio/english-community-v1/manifest.json"
 };
 
 const NUMBERS_CHILD_VOICE: AudioFilesVoiceConfig = {
@@ -85,7 +92,10 @@ const NUMBERS_CHILD_AUDIO_SOURCE = {
   manifestPath: "/audio/numbers-child-v1/manifest.json"
 };
 
-ENGLISH_COMMUNITY_VOICE.additionalSources = [NUMBERS_CHILD_AUDIO_SOURCE];
+ENGLISH_COMMUNITY_VOICE.additionalSources = [
+  ENGLISH_COMMUNITY_AUDIO_SOURCE,
+  NUMBERS_CHILD_AUDIO_SOURCE
+];
 
 const ENGLISH_LETTER_ROWS = [
   [

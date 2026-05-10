@@ -54,10 +54,12 @@ Today, Arabic and Bengali use browser speech synthesis through `src/lib/voice.ts
 
 English and Numbers are now wired for an optional community audio pack:
 
+- letters-by-Nuha folder: `public/audio/letters-by-nuha/`
+- direct naming: drop in files like `a.mp4`, `b.mp4`, `space.mp4`, or `enter.mp4` and the English voice layer will try them automatically
 - audio folder: `public/audio/english-community-v1/`
 - manifest: `public/audio/english-community-v1/manifest.json`
 - fallback: browser speech synthesis when a listed asset is missing
-- English can also fall through to secondary audio sources, so its number keys can reuse the shipped child number clips
+- English first checks the direct Nuha folder, then the community pack, then the shipped child number clips for digit keys
 
 Numbers also ship with a real child-voice subset:
 

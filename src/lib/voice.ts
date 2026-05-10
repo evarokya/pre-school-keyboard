@@ -1,4 +1,7 @@
-import type { VoiceConfig } from "@/lib/language-packs";
+import type {
+  AudioFileExtension,
+  VoiceConfig
+} from "@/lib/language-packs";
 
 type SpeakRequest = {
   text: string;
@@ -12,7 +15,7 @@ const audioManifestCache = new Map<string, Promise<Set<string>>>();
 
 type AudioSource = {
   basePath: string;
-  extension?: "mp3" | "wav" | "ogg";
+  extension?: AudioFileExtension;
   manifestPath?: string;
 };
 
@@ -58,6 +61,12 @@ async function loadAudioManifest(
   audioManifestCache.set(source.manifestPath, manifestPromise);
 
   return manifestPromise;
+}
+
+function getAudioUrl(source: AudioSource, assetKey: string): string {
+  const fileExtension = source.extension ?? "mp3";
+
+  return `${source.basePath}/${assetKey}.${fileExtension}`;
 }
 
 function getAudioSources(
@@ -128,8 +137,9 @@ async function speakWithAudioFiles(
       continue;
     }
 
-    const fileExtension = source.extension ?? "mp3";
-    const audio = new Audio(`${source.basePath}/${assetKey}.${fileExtension}`);
+    const audioUrl = getAudioUrl(source, assetKey);
+
+    const audio = new Audio(audioUrl);
 
     activeAudio = audio;
 

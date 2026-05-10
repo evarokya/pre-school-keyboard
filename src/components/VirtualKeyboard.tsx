@@ -1,5 +1,10 @@
 import type { Palette } from "@/lib/constants";
-import { filterLanguageRows, type LanguageKey, type LanguagePack } from "@/lib/language-packs";
+import {
+  filterLanguageRows,
+  normalizeLanguageLookupValue,
+  type LanguageKey,
+  type LanguagePack
+} from "@/lib/language-packs";
 
 type VirtualKeyboardProps = {
   languagePack: LanguagePack;
@@ -7,6 +12,7 @@ type VirtualKeyboardProps = {
   palette: Palette;
   visibleKeyIds?: ReadonlySet<string>;
   minimal?: boolean;
+  activeKeyValue?: string | null;
 };
 
 function getKeyButtonClasses(languageKey: LanguageKey, minimal: boolean): string {
@@ -32,9 +38,11 @@ export function VirtualKeyboard({
   onKeyPress,
   palette,
   visibleKeyIds,
-  minimal = false
+  minimal = false,
+  activeKeyValue = null
 }: VirtualKeyboardProps) {
   const visibleRows = filterLanguageRows(languagePack, visibleKeyIds);
+  const normalizedActiveKeyValue = activeKeyValue ? normalizeLanguageLookupValue(activeKeyValue) : null;
 
   return (
     <section
@@ -61,21 +69,31 @@ export function VirtualKeyboard({
       <div className={`${minimal ? "space-y-2" : "space-y-2"}`} dir={languagePack.direction}>
         {visibleRows.map((row, rowIndex) => (
           <div key={`${languagePack.id}-${rowIndex}`} className={`flex flex-wrap ${minimal ? "gap-1.5" : "gap-2"}`}>
-            {row.map((languageKey, keyIndex) => (
-              <button
-                key={`${languagePack.id}-${rowIndex}-${keyIndex}`}
-                type="button"
-                onClick={() => onKeyPress(languageKey)}
-                className={getKeyButtonClasses(languageKey, minimal)}
-                style={{
-                  background: palette.historySurface,
-                  borderColor: palette.buttonBorder,
-                  color: palette.historyText
-                }}
-              >
-                {languageKey.label ?? languageKey.displayText ?? languageKey.value}
-              </button>
-            ))}
+            {row.map((languageKey, keyIndex) => {
+              const isActive =
+                normalizedActiveKeyValue !== null &&
+                normalizeLanguageLookupValue(languageKey.value) === normalizedActiveKeyValue;
+
+              return (
+                <button
+                  key={`${languagePack.id}-${rowIndex}-${keyIndex}`}
+                  type="button"
+                  onClick={() => onKeyPress(languageKey)}
+                  className={`${getKeyButtonClasses(languageKey, minimal)} ${isActive ? "scale-[1.03] -translate-y-0.5" : ""}`}
+                  style={{
+                    background: isActive ? palette.activeKeySurface : palette.historySurface,
+                    borderColor: isActive ? palette.activeKeyBorder : palette.buttonBorder,
+                    color: isActive ? palette.activeKeyText : palette.historyText,
+                    boxShadow: isActive
+                      ? `0 12px 26px ${palette.activeKeyGlow}, inset 0 1px 0 rgba(255,255,255,0.72)`
+                      : undefined
+                  }}
+                  aria-pressed={isActive}
+                >
+                  {languageKey.label ?? languageKey.displayText ?? languageKey.value}
+                </button>
+              );
+            })}
           </div>
         ))}
       </div>

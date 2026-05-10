@@ -31,6 +31,7 @@ type GameState = {
   message: string;
   palette: Palette;
   burstKey: number;
+  activeKeyValue: string | null;
 };
 
 const INITIAL_PALETTE = PALETTES[0];
@@ -42,7 +43,8 @@ const INITIAL_STATE: GameState = {
   emoji: IDLE_EMOJI,
   message: "",
   palette: INITIAL_PALETTE,
-  burstKey: 0
+  burstKey: 0,
+  activeKeyValue: null
 };
 
 const INTERACTIVE_TAGS = new Set(["BUTTON", "A", "INPUT", "SELECT", "TEXTAREA"]);
@@ -133,7 +135,8 @@ export function TypingGame() {
         emoji: getRandomItem(EMOJIS),
         message: getRandomItem(MESSAGES),
         palette: nextPalette,
-        burstKey: currentState.burstKey + 1
+        burstKey: currentState.burstKey + 1,
+        activeKeyValue: resolvedKey.value
       }));
     });
   }
@@ -304,6 +307,7 @@ export function TypingGame() {
               onKeyPress={handleVirtualKeyPress}
               palette={gameState.palette}
               minimal
+              activeKeyValue={gameState.activeKeyValue}
             />
           </div>
         ) : showPlayControls ? (

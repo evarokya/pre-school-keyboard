@@ -329,7 +329,7 @@ export function getLanguagePackById(id: LanguagePackId): LanguagePack {
   return languagePack;
 }
 
-function normalizeLookupValue(value: string): string {
+export function normalizeLanguageLookupValue(value: string): string {
   return /^[A-Z]$/.test(value) ? value.toLowerCase() : value;
 }
 
@@ -337,10 +337,10 @@ export function findLanguageKeyByValue(
   languagePack: LanguagePack,
   value: string
 ): LanguageKey | undefined {
-  const normalizedValue = normalizeLookupValue(value);
+  const normalizedValue = normalizeLanguageLookupValue(value);
 
   for (const row of languagePack.rows) {
-    const match = row.find((languageKey) => normalizeLookupValue(languageKey.value) === normalizedValue);
+    const match = row.find((languageKey) => normalizeLanguageLookupValue(languageKey.value) === normalizedValue);
 
     if (match) {
       return match;

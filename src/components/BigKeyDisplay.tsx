@@ -67,7 +67,7 @@ export function BigKeyDisplay({
     ? immersive
       ? "text-[clamp(6rem,24vw,16rem)]"
       : constrained
-        ? "text-[clamp(3.6rem,12vw,8.5rem)] sm:text-[clamp(4rem,12vw,9rem)]"
+        ? "text-[clamp(3rem,9vw,6rem)] sm:text-[clamp(3.5rem,10vw,7rem)]"
       : "text-[clamp(4rem,15vw,11rem)] sm:text-[clamp(5rem,15vw,12rem)]"
     : immersive
       ? "text-[clamp(2.8rem,7vw,5.6rem)]"
@@ -180,7 +180,7 @@ export function BigKeyDisplay({
         ) : null}
       </div>
 
-      <div className={`grid min-h-0 flex-1 place-items-center ${contentPaddingClasses}`}>
+      <div className={`grid min-h-0 flex-1 place-items-center overflow-hidden ${contentPaddingClasses}`}>
         <div
           key={burstKey}
           className={`mx-auto flex w-full ${constrained ? "max-w-3xl" : "max-w-4xl"} flex-col items-center text-center ${isIdle ? "soft-rise" : "key-burst"}`}
@@ -226,12 +226,12 @@ export function BigKeyDisplay({
             ) : null}
 
             <div
-              className={`relative z-10 font-display ${displayTextClasses} leading-[0.82] tracking-[-0.08em]`}
+              className={`relative z-10 font-display ${displayTextClasses} leading-none tracking-[-0.04em]`}
               style={{
                 color: palette.keyText,
                 textShadow: displayText
-                  ? `0 3px 0 ${palette.activeKeyBorder}, 0 6px 0 ${palette.activeKeyBorder}, 0 9px 0 ${palette.activeKeyBorder}, 0 12px 16px rgba(0,0,0,0.08)`
-                  : `0 18px 55px ${palette.keyShadow}`
+                  ? `0 2px 0 ${palette.activeKeyBorder}, 0 4px 0 ${palette.activeKeyBorder}, 0 6px 10px rgba(0,0,0,0.07)`
+                  : `0 12px 40px ${palette.keyShadow}`
               }}
               dir={displayDirection}
             >

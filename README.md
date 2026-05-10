@@ -56,6 +56,7 @@ src/
 - `LICENSE` uses MIT so contributors can extend the project.
 - New languages should be added as language packs in `src/lib/language-packs.ts`.
 - English and Numbers now support an optional community voice-pack path in `public/audio/english-community-v1/`, with browser speech as fallback.
+- Numbers already include a first real child-voice subset in `public/audio/numbers-child-v1/` for `1` to `9`, with `0` still falling back to browser speech.
 - Future real child voice assets should start with English, then expand to other packs through the shared voice abstraction in `src/lib/voice.ts`.
 - The language-pack rows are already filterable so future parent controls can show either a full keyboard or only selected weak letters.
 
@@ -82,6 +83,7 @@ pnpm dev
 - Click several keys from the virtual keyboard and confirm they behave the same as physical keys
 - Press `A` and confirm it displays `A` and speaks `A`
 - Press `1` and confirm it displays `1` and speaks `one`
+- In `Numbers` mode, confirm `1` to `9` use the shipped child voice clips
 - Press `.` and confirm it displays `.` and speaks `dot`
 - Press `Space` and confirm it displays `Space` and speaks `space`
 - Confirm the background, emoji, and encouragement message change on each key press

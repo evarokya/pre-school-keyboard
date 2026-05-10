@@ -65,6 +65,14 @@ const ENGLISH_COMMUNITY_VOICE: AudioFilesVoiceConfig = {
   fallback: ENGLISH_VOICE
 };
 
+const NUMBERS_CHILD_VOICE: AudioFilesVoiceConfig = {
+  type: "audio-files",
+  basePath: "/audio/numbers-child-v1",
+  extension: "wav",
+  manifestPath: "/audio/numbers-child-v1/manifest.json",
+  fallback: ENGLISH_VOICE
+};
+
 const ARABIC_VOICE: SpeechSynthesisVoiceConfig = {
   type: "speech-synthesis",
   lang: "ar",
@@ -158,8 +166,8 @@ export const LANGUAGE_PACKS: readonly LanguagePack[] = [
     description: "A simple counting board focused on digits and a few familiar symbols.",
     direction: "ltr",
     prompt: "Count with clicks or number keys.",
-    hint: "Use the number row on the keyboard or click the big number buttons.",
-    voice: ENGLISH_COMMUNITY_VOICE,
+    hint: "Use the number row or click the big buttons. One to nine now use a real child voice.",
+    voice: NUMBERS_CHILD_VOICE,
     rows: [
       [
         key("1", { label: "1", assetKey: "one" }),

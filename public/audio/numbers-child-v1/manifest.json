@@ -1,0 +1,17 @@
+{
+  "voicePackId": "numbers-child-v1",
+  "language": "en-US",
+  "format": "wav",
+  "assetKeys": [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten"
+  ]
+}

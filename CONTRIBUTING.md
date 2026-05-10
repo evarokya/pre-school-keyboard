@@ -58,6 +58,13 @@ English and Numbers are now wired for an optional community audio pack:
 - manifest: `public/audio/english-community-v1/manifest.json`
 - fallback: browser speech synthesis when a listed asset is missing
 
+Numbers also ship with a real child-voice subset:
+
+- audio folder: `public/audio/numbers-child-v1/`
+- source: Zenodo child speech dataset under `CC BY 4.0`
+- current coverage: `one` through `nine` and `ten`
+- fallback: browser speech synthesis for `zero` and anything missing
+
 The voice layer supports `audio-files` mode, so a pack can move to real open-source child voice assets without changing the game loop.
 
 ## Adding a community voice pack

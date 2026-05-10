@@ -13,13 +13,14 @@ pnpm build       # build must succeed
 
 Then verify manually:
 
-- No `.env` files or secrets staged (`git diff --staged` — scan visually)
+- No `.env` files or secrets staged (`git diff --staged` - scan visually)
 - New env vars documented in `.env.example`
-- New tables have RLS policies in migration file
-- No `select("*")` passing data to client components
-- New public exports from `lib/` have matching types
+- No backend, analytics, or third-party tracking introduced
+- Key mappings cover letters, numbers, punctuation, and special keys such as Space, Enter, Backspace, Shift, and Escape
+- Speech and Fullscreen behavior fail gracefully when the browser does not support them
+- `universal/` remains unchanged
 
 Finally:
 
-- Summarize what this PR changes in 2–3 sentences (what changed and why)
+- Summarize what this PR changes in 2-3 sentences (what changed and why)
 - Flag any known limitations or follow-up items

@@ -5,40 +5,46 @@ Review staged changes: `git diff --staged`
 Check each category. Reference exact file paths and line numbers.
 
 **1. Correctness**
-- Does the code do what it claims?
-- Are edge cases handled (empty arrays, null inputs, missing rows)?
-- Are error paths returning appropriate HTTP status codes?
+- Pressed key is the same key displayed and spoken
+- Friendly mappings are correct for letters, numbers, punctuation, and special keys
+- Recent history is capped at 10 and updates in the intended order
+- Clear, Mute/Unmute, and Fullscreen behave correctly
+- Event listeners are attached once and cleaned up on unmount
 
-**2. Security**
-- No OAuth tokens or secrets in RSC payload or client component props
-- Auth check at top of every new route handler
-- New tables have RLS enabled and policies
-- User input validated before use
-- State cookie validated in OAuth callbacks
-- No TOCTOU races in status checks
+**2. Browser API safety**
+- `SpeechSynthesis` is used only on the client and guarded for unsupported browsers
+- `Fullscreen` calls handle missing API support and rejected requests
+- No speech queue buildup or duplicate listener registration
 
-**3. Types**
+**3. Accessibility and kid UX**
+- Main text is readable at a distance
+- Color changes preserve usable contrast for text and controls
+- Controls remain usable with keyboard-only navigation
+
+**4. Types**
 - No `any` without explanatory comment
 - No unsafe `as Foo` assertions that hide runtime errors
-- Types inferred from Zod schemas — no manual duplicates
+- Shared types stay consistent between display and speech helpers
 
-**4. Scope**
-- No features added beyond what was asked
-- No premature abstractions
+**5. Scope**
+- No backend, database, auth, analytics, or tracking added in version 1
+- No premature game modes, rewards, or parent dashboards
 - No half-finished code
 
-**5. Tests**
-- New business logic in `lib/` has matching Vitest tests
+**6. Tests**
+- New business logic in `src/lib/` has matching Vitest tests
 - Tests assert behavior, not implementation
+- Special-key and punctuation mappings have explicit coverage
 
-**6. Git hygiene**
+**7. Git hygiene**
 - No secrets staged
-- No `pnpm-lock.yaml` touched unnecessarily
+- No unrelated boilerplate files modified
+- `universal/` remains untouched unless explicitly requested
 
-Output format — one line per finding:
+Output format - one line per finding:
 
-```
-[BLOCKING]  path/to/file.ts:42  — problem. required action.
-[WARNING]   path/to/file.ts:88  — problem. should fix before merge.
-[NITPICK]   path/to/file.ts:101 — optional improvement.
+```text
+[BLOCKING]  path/to/file.ts:42  - problem. required action.
+[WARNING]   path/to/file.ts:88  - problem. should fix before merge.
+[NITPICK]   path/to/file.ts:101 - optional improvement.
 ```

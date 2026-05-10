@@ -1,0 +1,157 @@
+@import "@fontsource/baloo-2/600.css";
+@import "@fontsource/baloo-2/700.css";
+@import "@fontsource/baloo-2/800.css";
+@import "@fontsource/nunito/400.css";
+@import "@fontsource/nunito/600.css";
+@import "@fontsource/nunito/700.css";
+@import "@fontsource/nunito/800.css";
+@import "tailwindcss";
+
+:root {
+  --app-background: #fff7ef;
+  --app-foreground: #17324d;
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: var(--app-background);
+  color: var(--app-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(255, 143, 171, 0.35);
+}
+
+.font-body {
+  font-family: "Nunito", "Trebuchet MS", ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: "Baloo 2", "Trebuchet MS", ui-rounded, system-ui, sans-serif;
+}
+
+.play-surface {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.play-surface::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.42;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+  background-size: 30px 30px;
+  content: "";
+}
+
+.play-surface::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.18;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.88), transparent 40%),
+    radial-gradient(circle at 78% 30%, rgba(255, 255, 255, 0.58), transparent 35%),
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.48), transparent 34%);
+  content: "";
+}
+
+.floating-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(12px);
+  opacity: 0.9;
+  animation: drift 12s ease-in-out infinite;
+}
+
+.floating-orb--slow {
+  animation-duration: 15s;
+}
+
+.floating-orb--delay {
+  animation-delay: -4s;
+}
+
+.floating-orb--late {
+  animation-delay: -8s;
+}
+
+.stage-entrance {
+  animation: stageEntrance 500ms ease-out both;
+}
+
+.key-burst {
+  animation: keyBurst 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.soft-rise {
+  animation: softRise 680ms ease-out both;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate3d(14px, -18px, 0) scale(1.04);
+  }
+
+  66% {
+    transform: translate3d(-18px, 10px, 0) scale(0.96);
+  }
+}
+
+@keyframes stageEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes keyBurst {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.82);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.06);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes softRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

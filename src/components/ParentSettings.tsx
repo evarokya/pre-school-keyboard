@@ -3,11 +3,6 @@ import Link from "next/link";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { LearningModeSelector } from "@/components/LearningModeSelector";
 import type { Palette } from "@/lib/constants";
-import {
-  getKidAgeLabel,
-  getKidPlayStyleLabel,
-  type KidProfile
-} from "@/lib/kid-profile";
 import type { LearningMode } from "@/lib/learning-content";
 import type { LanguagePack, LanguagePackId } from "@/lib/language-packs";
 import {
@@ -21,8 +16,6 @@ type ParentSettingsProps = {
   isOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
-  kidProfile: KidProfile | null;
-  onOpenKidProfile: () => void;
   learningMode: LearningMode;
   onLearningModeChange: (learningMode: LearningMode) => void;
   languagePack: LanguagePack;
@@ -135,8 +128,6 @@ export function ParentSettings({
   isOpen,
   onToggle,
   onClose,
-  kidProfile,
-  onOpenKidProfile,
   learningMode,
   onLearningModeChange,
   languagePack,
@@ -153,9 +144,6 @@ export function ParentSettings({
   onArabicVoiceChange,
   palette
 }: ParentSettingsProps) {
-  const kidAgeLabel = kidProfile ? getKidAgeLabel(kidProfile.ageGroup) : "Not set yet";
-  const kidPlayStyleLabel = kidProfile ? getKidPlayStyleLabel(kidProfile.playStyle) : "Choose a style";
-
   return (
     <>
       <button
@@ -245,58 +233,6 @@ export function ParentSettings({
 
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-5 pt-4 sm:px-5 sm:pb-5">
               <div className="space-y-4">
-              <div
-                className="rounded-[1.6rem] border p-4"
-                style={{
-                  background: palette.buttonSurface,
-                  borderColor: palette.buttonBorder
-                }}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-display text-2xl tracking-[-0.04em]" style={{ color: palette.keyText }}>
-                      Child setup
-                    </p>
-                    <p className="mt-1 text-sm font-bold leading-6" style={{ color: palette.detailText }}>
-                      We only remember this in this browser so the app can reopen with the same child-friendly setup.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={onOpenKidProfile}
-                    className="shrink-0 rounded-full border px-4 py-2 text-xs font-extrabold uppercase tracking-[0.18em] transition hover:-translate-y-0.5"
-                    style={{
-                      background: palette.historySurface,
-                      borderColor: palette.buttonBorder,
-                      color: palette.buttonText
-                    }}
-                  >
-                    Edit
-                  </button>
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span
-                    className="rounded-full px-3 py-2 text-xs font-extrabold uppercase tracking-[0.18em]"
-                    style={{
-                      background: palette.badgeSurface,
-                      color: palette.badgeText
-                    }}
-                  >
-                    {kidAgeLabel}
-                  </span>
-                  <span
-                    className="rounded-full px-3 py-2 text-xs font-extrabold uppercase tracking-[0.18em]"
-                    style={{
-                      background: palette.badgeSurface,
-                      color: palette.badgeText
-                    }}
-                  >
-                    {kidPlayStyleLabel}
-                  </span>
-                </div>
-              </div>
-
               <LearningModeSelector
                 learningMode={learningMode}
                 onChange={onLearningModeChange}

@@ -20,10 +20,17 @@ export const metadata: Metadata = {
   keywords: [
     "kids keyboard learning",
     "letters for kids",
-    "color learning",
-    "numbers for children",
+    "alphabet learning app",
+    "color learning for children",
+    "numbers for kids",
+    "early childhood education",
+    "Arabic letters for kids",
+    "Bengali alphabet",
+    "preschool learning",
     "typing game for kids",
-    "family learning app"
+    "family learning app",
+    "browser learning tool",
+    "free kids app"
   ],
   openGraph: {
     type: "website",

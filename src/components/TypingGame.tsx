@@ -5,7 +5,6 @@ import { startTransition, useEffect, useEffectEvent, useRef, useState, useSyncEx
 import { BigKeyDisplay } from "@/components/BigKeyDisplay";
 import { ColorPaletteBar } from "@/components/ColorPaletteBar";
 import { ControlButtons } from "@/components/ControlButtons";
-import { KidProfileSheet } from "@/components/KidProfileSheet";
 import { NumberBoard } from "@/components/NumberBoard";
 import { ParentSettings } from "@/components/ParentSettings";
 import { SiteNav } from "@/components/SiteNav";
@@ -28,9 +27,7 @@ import {
   getKidAgeLabel,
   getKidPlayStyleLabel,
   getProfileAwareHint,
-  getRecommendedNumberRange,
   loadKidProfile,
-  saveKidProfile,
   subscribeToKidProfile,
   type KidProfile
 } from "@/lib/kid-profile";
@@ -119,7 +116,6 @@ function shouldIgnoreShortcut(event: KeyboardEvent): boolean {
 
 export function TypingGame() {
   const [gameState, setGameState] = useState(INITIAL_STATE);
-  const [isKidProfileEditorOpen, setIsKidProfileEditorOpen] = useState(false);
   const [numberBoardRandomSeed, setNumberBoardRandomSeed] = useState(1);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
@@ -436,17 +432,6 @@ export function TypingGame() {
     }));
   }
 
-  function handleSaveKidProfile(profile: KidProfile) {
-    const recommendedNumberRange = getRecommendedNumberRange(profile.ageGroup);
-
-    saveKidProfile(profile);
-    updateParentSettings((currentSettings) => ({
-      ...currentSettings,
-      numberRangeMax: recommendedNumberRange
-    }));
-    setIsKidProfileEditorOpen(false);
-  }
-
   function handleNumberRangeChange(maxNumber: typeof numberRangeMax) {
     updateParentSettings((currentSettings) => ({
       ...currentSettings,
@@ -595,7 +580,6 @@ export function TypingGame() {
   ) : null;
   const kidAgeLabel = kidProfile ? getKidAgeLabel(kidProfile.ageGroup) : null;
   const kidPlayStyleLabel = kidProfile ? getKidPlayStyleLabel(kidProfile.playStyle) : null;
-  const isKidProfileSheetOpen = kidProfile === null || isKidProfileEditorOpen;
   const activeColorId =
     learningMode === "colors" && gameState.activeItemId
       ? (gameState.activeItemId as ColorOptionId)
@@ -608,22 +592,10 @@ export function TypingGame() {
     >
       <SiteNav currentPath="/" overlay />
 
-      <KidProfileSheet
-        key={kidProfile ? `${kidProfile.ageGroup}-${kidProfile.playStyle}` : "new"}
-        isOpen={isKidProfileSheetOpen}
-        initialProfile={kidProfile}
-        palette={gameState.palette}
-        canClose={kidProfile !== null}
-        onSave={handleSaveKidProfile}
-        onClose={() => setIsKidProfileEditorOpen(false)}
-      />
-
       <ParentSettings
         isOpen={isSettingsOpen}
         onToggle={() => setIsSettingsOpen((currentValue) => !currentValue)}
         onClose={() => setIsSettingsOpen(false)}
-        kidProfile={kidProfile}
-        onOpenKidProfile={() => setIsKidProfileEditorOpen(true)}
         learningMode={learningMode}
         onLearningModeChange={handleLearningModeChange}
         languagePack={selectedLanguagePack}

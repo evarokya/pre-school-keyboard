@@ -26,7 +26,7 @@ export const DEFAULT_PARENT_SETTINGS_STATE: ParentSettingsState = {
   numberBoardOrder: "ascending",
   showVirtualKeyboard: true,
   showPlayControls: false,
-  arabicVoice: "female"
+  arabicVoice: "male"
 };
 
 function isLearningMode(value: unknown): value is LearningMode {

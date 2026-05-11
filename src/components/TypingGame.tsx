@@ -8,7 +8,6 @@ import { ControlButtons } from "@/components/ControlButtons";
 import { KidProfileSheet } from "@/components/KidProfileSheet";
 import { NumberBoard } from "@/components/NumberBoard";
 import { ParentSettings } from "@/components/ParentSettings";
-import { SiteFooter } from "@/components/SiteFooter";
 import { SiteNav } from "@/components/SiteNav";
 import { VirtualKeyboard } from "@/components/VirtualKeyboard";
 import {
@@ -121,8 +120,10 @@ export function TypingGame() {
   const [isKidProfileEditorOpen, setIsKidProfileEditorOpen] = useState(false);
   const [numberBoardRandomSeed, setNumberBoardRandomSeed] = useState(1);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [autoPlayIndex, setAutoPlayIndex] = useState<number | null>(null);
-  const isAutoPlaying = autoPlayIndex !== null;
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const autoPlayCancelRef = useRef(false);
+  const autoPlayIndexRef = useRef(0);
+  const autoPlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const parentSettings = useSyncExternalStore(
     subscribeToParentSettingsState,
@@ -279,7 +280,7 @@ export function TypingGame() {
       return;
     }
 
-    setAutoPlayIndex(null);
+    autoPlayCancelRef.current = true;
     void activateResolvedKey(resolvedKey);
   });
 
@@ -295,21 +296,25 @@ export function TypingGame() {
     };
   }, []);
 
-  const stepAutoPlay = useEffectEvent((index: number) => {
+  const playAutoPlayItem = useEffectEvent((): Promise<void> => {
     const items = showNumberBoard
       ? numberBoardValues
       : activeLanguagePack.rows.flat().filter((k) => !k.size || k.size === "regular");
 
+    const index = autoPlayIndexRef.current;
+
     if (index >= items.length) {
-      setAutoPlayIndex(null);
-      return;
+      autoPlayCancelRef.current = true;
+      setIsAutoPlaying(false);
+      return Promise.resolve();
     }
 
     const item = items[index];
+    autoPlayIndexRef.current = index + 1;
 
     if (showNumberBoard) {
       const n = item as number;
-      void activateDisplayItem({
+      return activateDisplayItem({
         displayText: String(n),
         speechText: getNumberSpeechText(n),
         speechLang: getPackSpeechLang(selectedLanguagePack),
@@ -317,25 +322,37 @@ export function TypingGame() {
         assetKey: getNumberAssetKey(n),
         activeItemId: String(n)
       });
-    } else {
-      void activateResolvedKey(resolveVirtualLanguageKey(activeLanguagePack, item as LanguageKey));
     }
+
+    return activateResolvedKey(resolveVirtualLanguageKey(activeLanguagePack, item as LanguageKey));
   });
 
   useEffect(() => {
-    if (autoPlayIndex === null) return;
+    if (!isAutoPlaying) return;
 
-    stepAutoPlay(autoPlayIndex);
+    autoPlayCancelRef.current = false;
+    autoPlayIndexRef.current = 0;
 
-    const timer = setTimeout(() => {
-      setAutoPlayIndex((idx) => (idx !== null ? idx + 1 : null));
-    }, 2200);
+    function tick() {
+      void playAutoPlayItem().then(() => {
+        if (!autoPlayCancelRef.current) {
+          autoPlayTimerRef.current = setTimeout(tick, 2500);
+        }
+      });
+    }
 
-    return () => clearTimeout(timer);
-  }, [autoPlayIndex, stepAutoPlay]);
+    tick();
+
+    return () => {
+      autoPlayCancelRef.current = true;
+      if (autoPlayTimerRef.current) clearTimeout(autoPlayTimerRef.current);
+    };
+  }, [isAutoPlaying, playAutoPlayItem]);
 
   useEffect(() => {
-    setAutoPlayIndex(null);
+    autoPlayCancelRef.current = true;
+    if (autoPlayTimerRef.current) clearTimeout(autoPlayTimerRef.current);
+    setIsAutoPlaying(false);
   }, [learningMode, selectedLanguageId]);
 
   function handleToggleMute() {
@@ -440,12 +457,14 @@ export function TypingGame() {
   }
 
   function handleVirtualKeyPress(languageKey: LanguageKey) {
-    setAutoPlayIndex(null);
+    autoPlayCancelRef.current = true;
+    setIsAutoPlaying(false);
     void activateResolvedKey(resolveVirtualLanguageKey(activeLanguagePack, languageKey));
   }
 
   function handleNumberSelect(value: number) {
-    setAutoPlayIndex(null);
+    autoPlayCancelRef.current = true;
+    setIsAutoPlaying(false);
     const displayText = String(value);
 
     void activateDisplayItem({
@@ -569,7 +588,6 @@ export function TypingGame() {
       style={{ background: gameState.palette.background }}
     >
       <SiteNav currentPath="/" overlay />
-      <SiteFooter overlay />
 
       <KidProfileSheet
         key={kidProfile ? `${kidProfile.ageGroup}-${kidProfile.playStyle}` : "new"}
@@ -643,7 +661,7 @@ export function TypingGame() {
             <div className="flex justify-center">
               <button
                 type="button"
-                onClick={() => setAutoPlayIndex(isAutoPlaying ? null : 0)}
+                onClick={() => { if (isAutoPlaying) { autoPlayCancelRef.current = true; setIsAutoPlaying(false); } else { setIsAutoPlaying(true); } }}
                 className="flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-extrabold uppercase tracking-[0.16em] shadow-[0_4px_0_rgba(45,48,71,0.14),0_8px_18px_rgba(45,48,71,0.06)] transition duration-150 hover:-translate-y-px active:translate-y-0.5 active:shadow-[0_1px_0_rgba(45,48,71,0.14)]"
                 style={{
                   background: isAutoPlaying ? gameState.palette.activeKeySurface : gameState.palette.buttonSurface,
@@ -731,7 +749,7 @@ export function TypingGame() {
                   <div className="flex justify-center">
                     <button
                       type="button"
-                      onClick={() => setAutoPlayIndex(isAutoPlaying ? null : 0)}
+                      onClick={() => { if (isAutoPlaying) { autoPlayCancelRef.current = true; setIsAutoPlaying(false); } else { setIsAutoPlaying(true); } }}
                       className="flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-extrabold uppercase tracking-[0.16em] shadow-[0_4px_0_rgba(45,48,71,0.14),0_8px_18px_rgba(45,48,71,0.06)] transition duration-150 hover:-translate-y-px active:translate-y-0.5 active:shadow-[0_1px_0_rgba(45,48,71,0.14)]"
                       style={{
                         background: isAutoPlaying ? gameState.palette.activeKeySurface : gameState.palette.buttonSurface,

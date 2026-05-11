@@ -55,7 +55,7 @@ type RootLayoutProps = Readonly<{
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body className="font-body antialiased">{children}</body>
+      <body className="font-body antialiased" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

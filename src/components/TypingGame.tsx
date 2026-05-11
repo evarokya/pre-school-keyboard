@@ -137,6 +137,14 @@ function getResponsiveNumberMax(selectedMax: NumberRangeMax): NumberRangeMax {
   return Math.min(selectedMax, 10) as NumberRangeMax;
 }
 
+function getIsDesktopViewport(): boolean {
+  if (typeof window === "undefined") {
+    return true;
+  }
+
+  return window.innerWidth >= 1024;
+}
+
 function shouldIgnoreShortcut(event: KeyboardEvent): boolean {
   if (INTERACTIVE_TAGS.has((event.target as HTMLElement | null)?.tagName ?? "")) {
     return true;
@@ -244,6 +252,11 @@ export function TypingGame() {
     subscribeToResize,
     () => getResponsiveNumberMax(numberRangeMax),
     () => numberRangeMax
+  );
+  const isDesktopViewport = useSyncExternalStore(
+    subscribeToResize,
+    getIsDesktopViewport,
+    () => true
   );
 
   useEffect(() => {
@@ -673,8 +686,9 @@ export function TypingGame() {
       : "Voice ready"
     : "Voice unavailable";
 
+  const effectiveShowVirtualKeyboard = isDesktopViewport ? showVirtualKeyboard : true;
   const showLettersKeyboard =
-    learningMode === "letters" && selectedLanguageId !== "numbers" && showVirtualKeyboard;
+    learningMode === "letters" && selectedLanguageId !== "numbers" && effectiveShowVirtualKeyboard;
   const showComputerKeyboard = learningMode === "computer";
   const showColorPalette = learningMode === "colors";
   const showInputPanel =

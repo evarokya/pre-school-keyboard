@@ -521,14 +521,16 @@ export function ParentSettings({
                   </div>
                 </div>
               ) : learningMode === "letters" ? (
-                <ToggleRow
-                  label="Virtual keyboard"
-                  description="Show or hide the clickable keyboard for mouse and touch play."
-                  checked={showVirtualKeyboard}
-                  onToggle={onToggleVirtualKeyboard}
-                  palette={palette}
-                  icon={<KeyboardIcon />}
-                />
+                <div className="hidden lg:block">
+                  <ToggleRow
+                    label="Virtual keyboard"
+                    description="Show or hide the clickable keyboard for mouse and touch play."
+                    checked={showVirtualKeyboard}
+                    onToggle={onToggleVirtualKeyboard}
+                    palette={palette}
+                    icon={<KeyboardIcon />}
+                  />
+                </div>
               ) : learningMode === "computer" ? null : (
                 <div
                   className="rounded-[1.4rem] border px-4 py-4"

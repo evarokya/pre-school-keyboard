@@ -222,6 +222,7 @@ export function TypingGame() {
     activeItemId: string;
     previewColor?: string | null;
     rotatePalette?: boolean;
+    skipBurst?: boolean;
     voice?: VoiceConfig;
   }) {
     const shouldRotatePalette = item.rotatePalette ?? true;
@@ -247,10 +248,10 @@ export function TypingGame() {
         displayText: item.displayText,
         speechText: item.speechText,
         displayDirection: item.textDirection,
-        emoji: getRandomItem(EMOJIS),
-        message: getRandomItem(MESSAGES),
+        emoji: item.skipBurst ? currentState.emoji : getRandomItem(EMOJIS),
+        message: item.skipBurst ? currentState.message : getRandomItem(MESSAGES),
         palette: nextPalette,
-        burstKey: currentState.burstKey + 1,
+        burstKey: item.skipBurst ? currentState.burstKey : currentState.burstKey + 1,
         activeItemId: item.activeItemId,
         previewColor: item.previewColor ?? null
       }));
@@ -325,7 +326,8 @@ export function TypingGame() {
         textDirection: "ltr",
         assetKey: getNumberAssetKey(n),
         activeItemId: String(n),
-        rotatePalette: false
+        rotatePalette: false,
+        skipBurst: true
       });
     }
 
@@ -337,7 +339,8 @@ export function TypingGame() {
       textDirection: resolved.textDirection,
       assetKey: resolved.assetKey,
       activeItemId: resolved.value,
-      rotatePalette: false
+      rotatePalette: false,
+      skipBurst: true
     });
   });
 

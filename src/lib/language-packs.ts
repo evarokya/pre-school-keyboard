@@ -98,6 +98,41 @@ ENGLISH_COMMUNITY_VOICE.additionalSources = [
   NUMBERS_CHILD_AUDIO_SOURCE
 ];
 
+const ENGLISH_ALPHA_ROWS = [
+  [
+    key("a", { label: "A" }),
+    key("b", { label: "B" }),
+    key("c", { label: "C" }),
+    key("d", { label: "D" }),
+    key("e", { label: "E" }),
+    key("f", { label: "F" }),
+    key("g", { label: "G" }),
+    key("h", { label: "H" }),
+    key("i", { label: "I" })
+  ],
+  [
+    key("j", { label: "J" }),
+    key("k", { label: "K" }),
+    key("l", { label: "L" }),
+    key("m", { label: "M" }),
+    key("n", { label: "N" }),
+    key("o", { label: "O" }),
+    key("p", { label: "P" }),
+    key("q", { label: "Q" }),
+    key("r", { label: "R" })
+  ],
+  [
+    key("s", { label: "S" }),
+    key("t", { label: "T" }),
+    key("u", { label: "U" }),
+    key("v", { label: "V" }),
+    key("w", { label: "W" }),
+    key("x", { label: "X" }),
+    key("y", { label: "Y" }),
+    key("z", { label: "Z" })
+  ]
+] as const;
+
 const ENGLISH_LETTER_ROWS = [
   [
     key("q", { label: "Q" }),
@@ -228,7 +263,7 @@ export const LANGUAGE_PACKS: readonly LanguagePack[] = [
     prompt: "Press a letter key or click the alphabet board.",
     hint: "English letter mode now stays focused on A to Z.",
     voice: ENGLISH_COMMUNITY_VOICE,
-    rows: ENGLISH_LETTER_ROWS
+    rows: ENGLISH_ALPHA_ROWS
   },
   {
     id: "numbers",

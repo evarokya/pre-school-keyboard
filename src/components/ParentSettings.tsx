@@ -104,6 +104,21 @@ function KeyboardIcon() {
   );
 }
 
+function ComputerBasicsIcon() {
+  return (
+    <svg viewBox="0 0 72 48" className="h-14 w-20" fill="none" aria-hidden="true">
+      <rect x="8" y="5" width="34" height="24" rx="5" fill="#dff2ff" stroke="#52b6ff" strokeWidth="3" />
+      <path d="M20 36h14M27 29v7" stroke="#17324d" strokeWidth="3" strokeLinecap="round" />
+      <rect x="7" y="37" width="40" height="7" rx="3.5" fill="#fff4d8" stroke="#f4b678" strokeWidth="2.5" />
+      <path d="M14 40.5h.01M20 40.5h.01M26 40.5h.01M32 40.5h.01M38 40.5h.01" stroke="#17324d" strokeWidth="2.5" strokeLinecap="round" />
+      <rect x="51" y="26" width="13" height="18" rx="6.5" fill="#ffe1e9" stroke="#ff8fab" strokeWidth="2.5" />
+      <path d="M57.5 29v5" stroke="#7a284f" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="25" cy="17" r="4" fill="#70d96f" />
+      <path d="M21.5 23.5c2.2-2.4 4.7-2.4 7 0" stroke="#17324d" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function PlayControlsIcon() {
   return (
     <svg viewBox="0 0 32 32" className="h-8 w-8" fill="none" aria-hidden="true">
@@ -113,6 +128,46 @@ function PlayControlsIcon() {
     </svg>
   );
 }
+
+function StraightOrderIcon() {
+  return (
+    <svg viewBox="0 0 40 40" className="h-9 w-9" fill="none" aria-hidden="true">
+      <path d="M8 20h21" stroke="#52b6ff" strokeWidth="4" strokeLinecap="round" />
+      <path d="m24 12 8 8-8 8" stroke="#17324d" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="8" cy="20" r="3" fill="#70d96f" />
+    </svg>
+  );
+}
+
+function ReverseOrderIcon() {
+  return (
+    <svg viewBox="0 0 40 40" className="h-9 w-9" fill="none" aria-hidden="true">
+      <path d="M32 20H11" stroke="#ff8fab" strokeWidth="4" strokeLinecap="round" />
+      <path d="m16 12-8 8 8 8" stroke="#17324d" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="32" cy="20" r="3" fill="#f4b678" />
+    </svg>
+  );
+}
+
+function RandomOrderIcon() {
+  return (
+    <svg viewBox="0 0 40 40" className="h-9 w-9" fill="none" aria-hidden="true">
+      <path d="M8 12h5c6 0 8 16 14 16h5" stroke="#70d96f" strokeWidth="3.6" strokeLinecap="round" />
+      <path d="M8 28h5c3.5 0 5.5-5.5 8-10" stroke="#52b6ff" strokeWidth="3.6" strokeLinecap="round" />
+      <path d="m28 8 5 4-5 4M28 24l5 4-5 4" stroke="#17324d" strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const NUMBER_ORDER_OPTIONS: readonly {
+  id: NumberBoardOrder;
+  label: string;
+  icon: ReactNode;
+}[] = [
+  { id: "ascending", label: "Straight order", icon: <StraightOrderIcon /> },
+  { id: "descending", label: "Reverse order", icon: <ReverseOrderIcon /> },
+  { id: "random", label: "Random order", icon: <RandomOrderIcon /> }
+];
 
 function PrincessIcon() {
   return (
@@ -210,6 +265,31 @@ export function ParentSettings({
   onArabicVoiceChange,
   palette
 }: ParentSettingsProps) {
+  const computerModeIcons = (
+    <div className="grid grid-cols-2 gap-2">
+      <div
+        className="grid min-h-20 place-items-center rounded-[1.4rem] border px-4 py-4"
+        style={{
+          background: palette.buttonSurface,
+          borderColor: palette.buttonBorder
+        }}
+        aria-label="Computer basics"
+      >
+        <ComputerBasicsIcon />
+      </div>
+      <div
+        className="grid min-h-20 place-items-center rounded-[1.4rem] border px-4 py-4"
+        style={{
+          background: palette.buttonSurface,
+          borderColor: palette.buttonBorder
+        }}
+        aria-label="Practice keyboard"
+      >
+        <KeyboardIcon />
+      </div>
+    </div>
+  );
+
   return (
     <>
       <button
@@ -306,20 +386,7 @@ export function ParentSettings({
               />
 
               {learningMode === "computer" ? (
-                <div
-                  className="rounded-[1.4rem] border px-4 py-4"
-                  style={{
-                    background: palette.buttonSurface,
-                    borderColor: palette.buttonBorder
-                  }}
-                >
-                  <p className="font-display text-2xl tracking-[-0.04em]" style={{ color: palette.keyText }}>
-                    Computer basics
-                  </p>
-                  <p className="mt-1 hidden text-sm font-bold leading-6 sm:block" style={{ color: palette.detailText }}>
-                    Keyboard practice uses the English computer board for now so kids can learn common keys first.
-                  </p>
-                </div>
+                computerModeIcons
               ) : (
                 <LanguageSelector
                   languagePack={languagePack}
@@ -398,7 +465,7 @@ export function ParentSettings({
                           key={option}
                           type="button"
                           onClick={() => onNumberRangeChange(option)}
-                          className={`rounded-[1.2rem] border px-3 py-3 text-left transition ${
+                          className={`grid min-h-16 place-items-center rounded-[1.2rem] border px-3 py-3 text-center transition ${
                             isActive ? "scale-[1.01]" : "hover:-translate-y-0.5"
                           }`}
                           style={{
@@ -408,32 +475,26 @@ export function ParentSettings({
                             boxShadow: isActive ? `0 14px 26px ${palette.activeKeyGlow}` : undefined
                           }}
                           aria-pressed={isActive}
+                          aria-label={`Use numbers 1 to ${option}`}
                         >
-                          <p className="font-display text-2xl tracking-[-0.04em]">{`1-${option}`}</p>
-                          <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] opacity-85">
-                            Counting board
-                          </p>
+                          <span className="font-display text-3xl leading-none tracking-[-0.05em]">
+                            {option}
+                          </span>
                         </button>
                       );
                     })}
                   </div>
 
-                  <div className="mt-4 grid grid-cols-3 gap-2">
-                    {(["ascending", "descending", "random"] as const).map((option) => {
-                      const isActive = option === numberBoardOrder;
-                      const label =
-                        option === "ascending"
-                          ? "Straight"
-                          : option === "descending"
-                            ? "Reverse"
-                            : "Random";
+                  <div className="mt-4 grid grid-cols-3 gap-2" aria-label="Number order">
+                    {NUMBER_ORDER_OPTIONS.map((option) => {
+                      const isActive = option.id === numberBoardOrder;
 
                       return (
                         <button
-                          key={option}
+                          key={option.id}
                           type="button"
-                          onClick={() => onNumberBoardOrderChange(option)}
-                          className={`rounded-[1.2rem] border px-3 py-3 text-left transition ${
+                          onClick={() => onNumberBoardOrderChange(option.id)}
+                          className={`grid min-h-16 place-items-center rounded-[1.2rem] border px-3 py-3 transition ${
                             isActive ? "scale-[1.01]" : "hover:-translate-y-0.5"
                           }`}
                           style={{
@@ -443,11 +504,9 @@ export function ParentSettings({
                             boxShadow: isActive ? `0 14px 26px ${palette.activeKeyGlow}` : undefined
                           }}
                           aria-pressed={isActive}
+                          aria-label={option.label}
                         >
-                          <p className="font-display text-2xl tracking-[-0.04em]">{label}</p>
-                          <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] opacity-85">
-                            Order
-                          </p>
+                          {option.icon}
                         </button>
                       );
                     })}
@@ -462,22 +521,7 @@ export function ParentSettings({
                   palette={palette}
                   icon={<KeyboardIcon />}
                 />
-              ) : learningMode === "computer" ? (
-                <div
-                  className="rounded-[1.4rem] border px-4 py-4"
-                  style={{
-                    background: palette.buttonSurface,
-                    borderColor: palette.buttonBorder
-                  }}
-                >
-                  <p className="font-display text-2xl tracking-[-0.04em]" style={{ color: palette.keyText }}>
-                    Practice keyboard
-                  </p>
-                  <p className="mt-1 hidden text-sm font-bold leading-6 sm:block" style={{ color: palette.detailText }}>
-                    Computer mode keeps the keyboard visible so children can match real keys with the screen.
-                  </p>
-                </div>
-              ) : (
+              ) : learningMode === "computer" ? null : (
                 <div
                   className="rounded-[1.4rem] border px-4 py-4"
                   style={{

@@ -7,6 +7,7 @@ import { ColorPaletteBar } from "@/components/ColorPaletteBar";
 import { ControlButtons } from "@/components/ControlButtons";
 import { NumberBoard } from "@/components/NumberBoard";
 import { ParentSettings } from "@/components/ParentSettings";
+import { PlayActionDock } from "@/components/PlayActionDock";
 import { SiteNav } from "@/components/SiteNav";
 import { StartRail, type StartRailItem } from "@/components/StartRail";
 import { VirtualKeyboard } from "@/components/VirtualKeyboard";
@@ -115,6 +116,42 @@ function shouldIgnoreShortcut(event: KeyboardEvent): boolean {
   }
 
   return event.ctrlKey || event.metaKey || event.altKey;
+}
+
+type AutoPlayButtonProps = {
+  isAutoPlaying: boolean;
+  onToggle: () => void;
+  palette: Palette;
+  stacked?: boolean;
+};
+
+function AutoPlayButton({
+  isAutoPlaying,
+  onToggle,
+  palette,
+  stacked = false
+}: AutoPlayButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className={`flex items-center justify-center gap-2 rounded-full border text-sm font-extrabold uppercase tracking-[0.16em] shadow-[0_4px_0_rgba(45,48,71,0.14),0_8px_18px_rgba(45,48,71,0.06)] transition duration-150 hover:-translate-y-px active:translate-y-0.5 active:shadow-[0_1px_0_rgba(45,48,71,0.14)] ${
+        stacked ? "w-full px-4 py-3" : "px-5 py-2"
+      }`}
+      style={{
+        background: isAutoPlaying ? palette.activeKeySurface : palette.buttonSurface,
+        borderColor: isAutoPlaying ? palette.activeKeyBorder : palette.buttonBorder,
+        color: isAutoPlaying ? palette.activeKeyText : palette.buttonText,
+        boxShadow: isAutoPlaying
+          ? `0 4px 0 ${palette.activeKeyBorder}, 0 14px 26px ${palette.activeKeyGlow}`
+          : undefined
+      }}
+      aria-pressed={isAutoPlaying}
+    >
+      <span className="text-base leading-none">{isAutoPlaying ? "■" : "▶"}</span>
+      {isAutoPlaying ? "Stop" : "Play all"}
+    </button>
+  );
 }
 
 export function TypingGame() {
@@ -581,6 +618,17 @@ export function TypingGame() {
     await document.documentElement.requestFullscreen();
   }
 
+  function handleToggleAutoPlay() {
+    if (isAutoPlaying) {
+      if (autoPlayTimerRef.current) clearTimeout(autoPlayTimerRef.current);
+      stopVoicePlayback();
+      setIsAutoPlaying(false);
+      return;
+    }
+
+    setIsAutoPlaying(true);
+  }
+
   const voiceStatus = canSpeak
     ? isMuted
       ? "Voice muted"
@@ -646,6 +694,21 @@ export function TypingGame() {
       compact
     />
   ) : null;
+  const autoPlayButton = (
+    <AutoPlayButton
+      isAutoPlaying={isAutoPlaying}
+      onToggle={handleToggleAutoPlay}
+      palette={gameState.palette}
+    />
+  );
+  const stackedAutoPlayButton = (
+    <AutoPlayButton
+      isAutoPlaying={isAutoPlaying}
+      onToggle={handleToggleAutoPlay}
+      palette={gameState.palette}
+      stacked
+    />
+  );
   const kidAgeLabel = kidProfile ? getKidAgeLabel(kidProfile.ageGroup) : null;
   const kidPlayStyleLabel = kidProfile ? getKidPlayStyleLabel(kidProfile.playStyle) : null;
   const activeColorId =
@@ -720,24 +783,10 @@ export function TypingGame() {
       <div className={`mx-auto flex min-h-[calc(100svh-2rem)] w-full flex-col sm:h-full sm:min-h-0 ${shellLayoutClasses}`}>
         {showNumberBoard ? (
           <>
-            {controls}
+            <div className="lg:hidden">{controls}</div>
 
-            <div className="flex justify-center">
-              <button
-                type="button"
-                onClick={() => { if (isAutoPlaying) { if (autoPlayTimerRef.current) clearTimeout(autoPlayTimerRef.current); stopVoicePlayback(); setIsAutoPlaying(false); } else { setIsAutoPlaying(true); } }}
-                className="flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-extrabold uppercase tracking-[0.16em] shadow-[0_4px_0_rgba(45,48,71,0.14),0_8px_18px_rgba(45,48,71,0.06)] transition duration-150 hover:-translate-y-px active:translate-y-0.5 active:shadow-[0_1px_0_rgba(45,48,71,0.14)]"
-                style={{
-                  background: isAutoPlaying ? gameState.palette.activeKeySurface : gameState.palette.buttonSurface,
-                  borderColor: isAutoPlaying ? gameState.palette.activeKeyBorder : gameState.palette.buttonBorder,
-                  color: isAutoPlaying ? gameState.palette.activeKeyText : gameState.palette.buttonText,
-                  boxShadow: isAutoPlaying ? `0 4px 0 ${gameState.palette.activeKeyBorder}, 0 14px 26px ${gameState.palette.activeKeyGlow}` : undefined
-                }}
-                aria-pressed={isAutoPlaying}
-              >
-                <span className="text-base leading-none">{isAutoPlaying ? "■" : "▶"}</span>
-                {isAutoPlaying ? "Stop" : "Play all"}
-              </button>
+            <div className="flex justify-center lg:hidden">
+              {autoPlayButton}
             </div>
 
             <StartRail
@@ -748,7 +797,7 @@ export function TypingGame() {
               palette={gameState.palette}
             />
 
-            <div className="flex min-h-0 flex-1 flex-col gap-3 sm:flex-row">
+            <div className="flex min-h-0 flex-1 flex-col gap-3 sm:flex-row lg:items-stretch">
               <div className="min-h-0 flex-[0.92]">
                 <BigKeyDisplay
                   displayText={gameState.displayText}
@@ -786,6 +835,11 @@ export function TypingGame() {
                   orderLabel={numberBoardOrderLabel}
                 />
               </div>
+
+              <PlayActionDock palette={gameState.palette}>
+                {stackedAutoPlayButton}
+                {controls}
+              </PlayActionDock>
             </div>
           </>
         ) : (
@@ -826,36 +880,31 @@ export function TypingGame() {
             {showInputPanel ? (
               <div className="flex flex-none flex-col gap-3">
                 {showLettersKeyboard ? (
-                  <div className="flex justify-center">
-                    <button
-                      type="button"
-                      onClick={() => { if (isAutoPlaying) { if (autoPlayTimerRef.current) clearTimeout(autoPlayTimerRef.current); stopVoicePlayback(); setIsAutoPlaying(false); } else { setIsAutoPlaying(true); } }}
-                      className="flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-extrabold uppercase tracking-[0.16em] shadow-[0_4px_0_rgba(45,48,71,0.14),0_8px_18px_rgba(45,48,71,0.06)] transition duration-150 hover:-translate-y-px active:translate-y-0.5 active:shadow-[0_1px_0_rgba(45,48,71,0.14)]"
-                      style={{
-                        background: isAutoPlaying ? gameState.palette.activeKeySurface : gameState.palette.buttonSurface,
-                        borderColor: isAutoPlaying ? gameState.palette.activeKeyBorder : gameState.palette.buttonBorder,
-                        color: isAutoPlaying ? gameState.palette.activeKeyText : gameState.palette.buttonText,
-                        boxShadow: isAutoPlaying ? `0 4px 0 ${gameState.palette.activeKeyBorder}, 0 14px 26px ${gameState.palette.activeKeyGlow}` : undefined
-                      }}
-                      aria-pressed={isAutoPlaying}
-                    >
-                      <span className="text-base leading-none">{isAutoPlaying ? "■" : "▶"}</span>
-                      {isAutoPlaying ? "Stop" : "Play all"}
-                    </button>
+                  <div className="flex justify-center lg:hidden">
+                    {autoPlayButton}
                   </div>
                 ) : null}
 
-                {controls}
+                <div className="lg:hidden">{controls}</div>
 
                 {showLettersKeyboard || showComputerKeyboard ? (
-                  <VirtualKeyboard
-                    languagePack={activeLanguagePack}
-                    onKeyPress={handleVirtualKeyPress}
-                    palette={gameState.palette}
-                    minimal
-                    dense={showComputerKeyboard}
-                    activeKeyValue={gameState.activeItemId}
-                  />
+                  <div className="flex min-h-0 gap-3">
+                    <div className="min-w-0 flex-1">
+                      <VirtualKeyboard
+                        languagePack={activeLanguagePack}
+                        onKeyPress={handleVirtualKeyPress}
+                        palette={gameState.palette}
+                        minimal
+                        dense={showComputerKeyboard}
+                        activeKeyValue={gameState.activeItemId}
+                      />
+                    </div>
+
+                    <PlayActionDock palette={gameState.palette}>
+                      {showLettersKeyboard ? stackedAutoPlayButton : null}
+                      {controls}
+                    </PlayActionDock>
+                  </div>
                 ) : null}
 
                 {showColorPalette ? (

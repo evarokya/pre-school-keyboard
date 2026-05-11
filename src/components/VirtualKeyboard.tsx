@@ -64,6 +64,10 @@ export function VirtualKeyboard({
 }: VirtualKeyboardProps) {
   const visibleRows = filterLanguageRows(languagePack, visibleKeyIds);
   const normalizedActiveKeyValue = activeKeyValue ? normalizeLanguageLookupValue(activeKeyValue) : null;
+  const complexGlyphClasses =
+    languagePack.id === "bengali"
+      ? "font-body leading-normal text-[1.45rem] sm:text-[1.65rem] min-h-12 py-2"
+      : "";
 
   return (
     <section
@@ -129,7 +133,7 @@ export function VirtualKeyboard({
                   key={`${languagePack.id}-${rowIndex}-${keyIndex}`}
                   type="button"
                   onClick={() => onKeyPress(languageKey)}
-                  className={`${getKeyButtonClasses(languageKey, minimal, dense)} ${isActive ? "scale-[1.03] -translate-y-0.5" : ""}`}
+                  className={`${getKeyButtonClasses(languageKey, minimal, dense)} ${complexGlyphClasses} ${isActive ? "scale-[1.03] -translate-y-0.5" : ""}`}
                   style={{
                     background: isActive ? palette.activeKeySurface : palette.historySurface,
                     borderColor: isActive ? palette.activeKeyBorder : palette.buttonBorder,

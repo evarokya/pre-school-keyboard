@@ -29,10 +29,20 @@ type BigKeyDisplayProps = {
 };
 
 const FLOATING_ECHOES = [
-  { className: "left-[4%] top-[8%] -rotate-12", delay: "0ms", duration: "4800ms" },
-  { className: "right-[6%] top-[14%] rotate-8", delay: "120ms", duration: "4400ms" },
-  { className: "left-[12%] bottom-[18%] rotate-6", delay: "220ms", duration: "5100ms" },
-  { className: "right-[12%] bottom-[12%] -rotate-9", delay: "320ms", duration: "4700ms" }
+  { className: "left-[3%] top-[6%] -rotate-12",    delay: "0ms",   duration: "4800ms" },
+  { className: "right-[4%] top-[12%] rotate-8",    delay: "100ms", duration: "4400ms" },
+  { className: "left-[10%] bottom-[20%] rotate-6", delay: "200ms", duration: "5100ms" },
+  { className: "right-[10%] bottom-[12%] -rotate-9", delay: "300ms", duration: "4700ms" },
+  { className: "left-[40%] top-[4%] -rotate-4",   delay: "150ms", duration: "4600ms" },
+  { className: "right-[36%] bottom-[6%] rotate-5", delay: "250ms", duration: "5000ms" }
+] as const;
+
+const SPARKLES = [
+  { char: "✦", className: "left-[22%] top-[28%]",   delay: "0ms",   size: "text-xl"   },
+  { char: "★", className: "right-[20%] top-[22%]",  delay: "80ms",  size: "text-base" },
+  { char: "✦", className: "left-[18%] bottom-[26%]", delay: "160ms", size: "text-sm"  },
+  { char: "★", className: "right-[22%] bottom-[22%]", delay: "240ms", size: "text-base" },
+  { char: "✦", className: "left-[46%] top-[18%]",   delay: "120ms", size: "text-sm"   }
 ] as const;
 
 export function BigKeyDisplay({
@@ -209,17 +219,33 @@ export function BigKeyDisplay({
               <div className="pointer-events-none absolute inset-0" aria-hidden="true">
                 {FLOATING_ECHOES.map((echo, index) => (
                   <span
-                    key={`${burstKey}-${index}`}
-                    className={`key-echo absolute font-display text-[clamp(1.4rem,4vw,2.8rem)] ${echo.className}`}
+                    key={`echo-${burstKey}-${index}`}
+                    className={`key-echo absolute font-display text-[clamp(1.3rem,3.6vw,2.6rem)] ${echo.className}`}
                     style={{
                       color: palette.badgeText,
                       background: palette.badgeSurface,
                       animationDelay: echo.delay,
                       animationDuration: echo.duration,
-                      boxShadow: `0 18px 35px ${palette.keyShadow}`
+                      boxShadow: `0 14px 28px ${palette.keyShadow}`
                     }}
                   >
                     {floatingEchoText}
+                  </span>
+                ))}
+                {SPARKLES.map((sparkle, index) => (
+                  <span
+                    key={`sparkle-${burstKey}-${index}`}
+                    className={`absolute ${sparkle.size} ${sparkle.className}`}
+                    style={{
+                      color: palette.activeKeyText,
+                      animationName: "sparklePop",
+                      animationDuration: "1100ms",
+                      animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+                      animationFillMode: "both",
+                      animationDelay: sparkle.delay
+                    }}
+                  >
+                    {sparkle.char}
                   </span>
                 ))}
               </div>

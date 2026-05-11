@@ -121,6 +121,8 @@ export function TypingGame() {
   const [isKidProfileEditorOpen, setIsKidProfileEditorOpen] = useState(false);
   const [numberBoardRandomSeed, setNumberBoardRandomSeed] = useState(1);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [autoPlayIndex, setAutoPlayIndex] = useState<number | null>(null);
+  const isAutoPlaying = autoPlayIndex !== null;
 
   const parentSettings = useSyncExternalStore(
     subscribeToParentSettingsState,
@@ -277,6 +279,7 @@ export function TypingGame() {
       return;
     }
 
+    setAutoPlayIndex(null);
     void activateResolvedKey(resolvedKey);
   });
 
@@ -291,6 +294,49 @@ export function TypingGame() {
       window.removeEventListener("keydown", onKeydown);
     };
   }, []);
+
+  const stepAutoPlay = useEffectEvent((index: number) => {
+    const items = showNumberBoard
+      ? numberBoardValues
+      : activeLanguagePack.rows.flat().filter((k) => !k.size || k.size === "regular");
+
+    if (index >= items.length) {
+      setAutoPlayIndex(null);
+      return;
+    }
+
+    const item = items[index];
+
+    if (showNumberBoard) {
+      const n = item as number;
+      void activateDisplayItem({
+        displayText: String(n),
+        speechText: getNumberSpeechText(n),
+        speechLang: getPackSpeechLang(selectedLanguagePack),
+        textDirection: "ltr",
+        assetKey: getNumberAssetKey(n),
+        activeItemId: String(n)
+      });
+    } else {
+      void activateResolvedKey(resolveVirtualLanguageKey(activeLanguagePack, item as LanguageKey));
+    }
+  });
+
+  useEffect(() => {
+    if (autoPlayIndex === null) return;
+
+    stepAutoPlay(autoPlayIndex);
+
+    const timer = setTimeout(() => {
+      setAutoPlayIndex((idx) => (idx !== null ? idx + 1 : null));
+    }, 2200);
+
+    return () => clearTimeout(timer);
+  }, [autoPlayIndex, stepAutoPlay]);
+
+  useEffect(() => {
+    setAutoPlayIndex(null);
+  }, [learningMode, selectedLanguageId]);
 
   function handleToggleMute() {
     updateParentSettings((currentSettings) => {
@@ -394,10 +440,12 @@ export function TypingGame() {
   }
 
   function handleVirtualKeyPress(languageKey: LanguageKey) {
+    setAutoPlayIndex(null);
     void activateResolvedKey(resolveVirtualLanguageKey(activeLanguagePack, languageKey));
   }
 
   function handleNumberSelect(value: number) {
+    setAutoPlayIndex(null);
     const displayText = String(value);
 
     void activateDisplayItem({
@@ -483,10 +531,8 @@ export function TypingGame() {
       ? gameState.activeItemId
       : null;
   const floatingEchoText =
-    learningMode === "computer" && gameState.displayText
-      ? gameState.displayText.length <= 10
-        ? gameState.displayText
-        : null
+    learningMode !== "colors" && gameState.displayText && gameState.displayText.length <= 6
+      ? gameState.displayText
       : null;
   const numberBoardValues = showNumberBoard
     ? getNumberBoardValues(numberRangeMax, numberBoardOrder, numberBoardRandomSeed)
@@ -594,6 +640,24 @@ export function TypingGame() {
           <>
             {controls}
 
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => setAutoPlayIndex(isAutoPlaying ? null : 0)}
+                className="flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-extrabold uppercase tracking-[0.16em] shadow-[0_4px_0_rgba(45,48,71,0.14),0_8px_18px_rgba(45,48,71,0.06)] transition duration-150 hover:-translate-y-px active:translate-y-0.5 active:shadow-[0_1px_0_rgba(45,48,71,0.14)]"
+                style={{
+                  background: isAutoPlaying ? gameState.palette.activeKeySurface : gameState.palette.buttonSurface,
+                  borderColor: isAutoPlaying ? gameState.palette.activeKeyBorder : gameState.palette.buttonBorder,
+                  color: isAutoPlaying ? gameState.palette.activeKeyText : gameState.palette.buttonText,
+                  boxShadow: isAutoPlaying ? `0 4px 0 ${gameState.palette.activeKeyBorder}, 0 14px 26px ${gameState.palette.activeKeyGlow}` : undefined
+                }}
+                aria-pressed={isAutoPlaying}
+              >
+                <span className="text-base leading-none">{isAutoPlaying ? "■" : "▶"}</span>
+                {isAutoPlaying ? "Stop" : "Play all"}
+              </button>
+            </div>
+
             <div className="flex min-h-0 flex-1 flex-col gap-3 sm:flex-row">
               <div className="min-h-0 flex-[0.92]">
                 <BigKeyDisplay
@@ -615,7 +679,7 @@ export function TypingGame() {
                   previewColor={gameState.previewColor}
                   activeColorId={activeColorId}
                   activeEnglishLetter={activeEnglishLetter}
-                  floatingEchoText={null}
+                  floatingEchoText={floatingEchoText}
                   kidProfile={kidProfile}
                   kidAgeLabel={kidAgeLabel}
                   kidPlayStyleLabel={kidPlayStyleLabel}
@@ -663,6 +727,26 @@ export function TypingGame() {
 
             {showInputPanel ? (
               <div className="flex flex-none flex-col gap-3">
+                {showLettersKeyboard ? (
+                  <div className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => setAutoPlayIndex(isAutoPlaying ? null : 0)}
+                      className="flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-extrabold uppercase tracking-[0.16em] shadow-[0_4px_0_rgba(45,48,71,0.14),0_8px_18px_rgba(45,48,71,0.06)] transition duration-150 hover:-translate-y-px active:translate-y-0.5 active:shadow-[0_1px_0_rgba(45,48,71,0.14)]"
+                      style={{
+                        background: isAutoPlaying ? gameState.palette.activeKeySurface : gameState.palette.buttonSurface,
+                        borderColor: isAutoPlaying ? gameState.palette.activeKeyBorder : gameState.palette.buttonBorder,
+                        color: isAutoPlaying ? gameState.palette.activeKeyText : gameState.palette.buttonText,
+                        boxShadow: isAutoPlaying ? `0 4px 0 ${gameState.palette.activeKeyBorder}, 0 14px 26px ${gameState.palette.activeKeyGlow}` : undefined
+                      }}
+                      aria-pressed={isAutoPlaying}
+                    >
+                      <span className="text-base leading-none">{isAutoPlaying ? "■" : "▶"}</span>
+                      {isAutoPlaying ? "Stop" : "Play all"}
+                    </button>
+                  </div>
+                ) : null}
+
                 {controls}
 
                 {showLettersKeyboard || showComputerKeyboard ? (

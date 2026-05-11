@@ -459,13 +459,21 @@ export function ParentSettings({
                   <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
                     {NUMBER_RANGE_OPTIONS.map((option) => {
                       const isActive = option === numberRangeMax;
+                      const availabilityClasses =
+                        option <= 10
+                          ? ""
+                          : option <= 20
+                            ? "hidden min-[430px]:grid"
+                            : option <= 50
+                              ? "hidden sm:grid"
+                              : "hidden lg:grid";
 
                       return (
                         <button
                           key={option}
                           type="button"
                           onClick={() => onNumberRangeChange(option)}
-                          className={`grid min-h-16 place-items-center rounded-[1.2rem] border px-3 py-3 text-center transition ${
+                          className={`${availabilityClasses} min-h-16 place-items-center rounded-[1.2rem] border px-3 py-3 text-center transition ${
                             isActive ? "scale-[1.01]" : "hover:-translate-y-0.5"
                           }`}
                           style={{

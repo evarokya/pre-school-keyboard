@@ -11,11 +11,8 @@ export type ColorOptionId =
   | "purple"
   | "pink"
   | "brown"
-  | "teal"
-  | "mint"
   | "white"
-  | "gray"
-  | "peach";
+  | "gray";
 
 type LearningCopyLanguage = "english" | "arabic" | "bengali";
 
@@ -42,6 +39,7 @@ type ColorDefinition = {
   swatch: string;
   ring: string;
   labelTextColor: string;
+  audioKey?: string;
   copy: Record<LearningCopyLanguage, LocalizedColorCopy>;
 };
 
@@ -194,28 +192,6 @@ const COLOR_OPTIONS: readonly ColorDefinition[] = [
     }
   },
   {
-    id: "teal",
-    swatch: "#6fcfd1",
-    ring: "#43a7aa",
-    labelTextColor: "#175f61",
-    copy: {
-      english: { label: "Teal", speechText: "teal", textDirection: "ltr" },
-      arabic: { label: "تركوازي", speechText: "تركوازي", textDirection: "rtl" },
-      bengali: { label: "টিল", speechText: "টিল", textDirection: "ltr" }
-    }
-  },
-  {
-    id: "mint",
-    swatch: "#b8f1d1",
-    ring: "#7cc79f",
-    labelTextColor: "#206647",
-    copy: {
-      english: { label: "Mint", speechText: "mint", textDirection: "ltr" },
-      arabic: { label: "نعناعي", speechText: "نعناعي", textDirection: "rtl" },
-      bengali: { label: "মিন্ট", speechText: "মিন্ট", textDirection: "ltr" }
-    }
-  },
-  {
     id: "white",
     swatch: "#fffef9",
     ring: "#d8d4c9",
@@ -231,21 +207,11 @@ const COLOR_OPTIONS: readonly ColorDefinition[] = [
     swatch: "#cdd5df",
     ring: "#9aa6b6",
     labelTextColor: "#465160",
+    audioKey: "grey",
     copy: {
       english: { label: "Gray", speechText: "gray", textDirection: "ltr" },
       arabic: { label: "رمادي", speechText: "رمادي", textDirection: "rtl" },
       bengali: { label: "ধূসর", speechText: "ধূসর", textDirection: "ltr" }
-    }
-  },
-  {
-    id: "peach",
-    swatch: "#ffc9ad",
-    ring: "#e4a485",
-    labelTextColor: "#7f4d34",
-    copy: {
-      english: { label: "Peach", speechText: "peach", textDirection: "ltr" },
-      arabic: { label: "خوخي", speechText: "خوخي", textDirection: "rtl" },
-      bengali: { label: "পিচ", speechText: "পিচ", textDirection: "ltr" }
     }
   }
 ] as const;
@@ -301,7 +267,7 @@ export function getColorOptionById(
     swatch: color.swatch,
     ring: color.ring,
     labelTextColor: color.labelTextColor,
-    assetKey: `color-${color.id}`,
+    assetKey: color.audioKey ?? color.id,
     label: localizedColor.label,
     speechText: localizedColor.speechText,
     textDirection: localizedColor.textDirection

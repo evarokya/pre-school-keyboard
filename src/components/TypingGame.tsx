@@ -37,11 +37,13 @@ import {
 import {
   ARABIC_FEMALE_VOICE,
   ARABIC_MALE_VOICE,
+  COLORS_VOICE,
   ENGLISH_COMPUTER_PRACTICE_PACK,
   getLanguagePackById,
   type LanguageKey,
   type LanguagePack,
-  type LanguagePackId
+  type LanguagePackId,
+  type VoiceConfig
 } from "@/lib/language-packs";
 import {
   getNumberAssetKey,
@@ -220,6 +222,7 @@ export function TypingGame() {
     activeItemId: string;
     previewColor?: string | null;
     rotatePalette?: boolean;
+    voice?: VoiceConfig;
   }) {
     const shouldRotatePalette = item.rotatePalette ?? true;
     const nextPalette = shouldRotatePalette
@@ -234,7 +237,7 @@ export function TypingGame() {
       await speakWithVoice({
         text: item.speechText,
         assetKey: item.assetKey,
-        voice: activeLanguagePack.voice,
+        voice: item.voice ?? activeLanguagePack.voice,
         speechLang: item.speechLang
       });
     }
@@ -500,7 +503,8 @@ export function TypingGame() {
       assetKey: resolvedColor.assetKey,
       activeItemId: resolvedColor.id,
       previewColor: resolvedColor.swatch,
-      rotatePalette: false
+      rotatePalette: false,
+      voice: COLORS_VOICE
     });
   }
 

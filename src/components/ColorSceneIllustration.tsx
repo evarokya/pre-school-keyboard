@@ -46,7 +46,6 @@ function SceneDecorations({ colorId }: { colorId: ColorOptionId }) {
         </>
       );
     case "green":
-    case "mint":
       return (
         <>
           <div className="absolute inset-x-0 bottom-0 h-10 rounded-t-[40%] bg-[#7bd08e]" />
@@ -70,7 +69,6 @@ function SceneDecorations({ colorId }: { colorId: ColorOptionId }) {
         </>
       );
     case "orange":
-    case "peach":
       return (
         <>
           <div className="absolute inset-x-0 bottom-0 h-8 bg-[#f3d9a0]" />
@@ -117,14 +115,6 @@ function SceneDecorations({ colorId }: { colorId: ColorOptionId }) {
           <div className="scene-rain absolute left-8 top-12 h-9 w-0.5 bg-white/75" />
           <div className="scene-rain scene-rain--delay absolute left-12 top-12 h-10 w-0.5 bg-white/75" />
           <div className="scene-rain scene-rain--late absolute left-16 top-12 h-8 w-0.5 bg-white/75" />
-        </>
-      );
-    case "teal":
-      return (
-        <>
-          <div className="absolute inset-x-0 bottom-0 h-9 bg-[#67c6c9]" />
-          <div className="scene-sway absolute left-6 bottom-6 h-4 w-10 rounded-full bg-white/65" />
-          <div className="scene-sway scene-sway--delay absolute right-6 bottom-8 h-4 w-12 rounded-full bg-white/55" />
         </>
       );
     default:

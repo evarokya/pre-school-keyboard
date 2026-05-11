@@ -183,6 +183,19 @@ const ARABIC_SPEECH_FALLBACK: SpeechSynthesisVoiceConfig = {
   volume: 1
 };
 
+export const COLORS_VOICE: AudioFilesVoiceConfig = {
+  type: "audio-files",
+  basePath: "/audio/colors-mp3",
+  extension: "mp3",
+  fallback: {
+    type: "speech-synthesis",
+    lang: "en-US",
+    rate: 0.9,
+    pitch: 1.05,
+    volume: 1
+  }
+};
+
 export const ARABIC_FEMALE_VOICE: AudioFilesVoiceConfig = {
   type: "audio-files",
   basePath: "/audio/arabic-letters/female-voice",
